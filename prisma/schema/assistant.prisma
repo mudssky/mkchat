@@ -1,0 +1,22 @@
+// 3. 助手 (The Brain)
+model Assistant {
+  id               String                 @id @default(cuid())
+  userId           String
+  user             User                   @relation(fields: [userId], references: [id])
+  name             String
+  providerConfigId String?
+  providerConfig   ProviderConfig?        @relation(fields: [providerConfigId], references: [id])
+  modelId          String
+  systemPrompt     String
+  mcpServers       AssistantOnMCPServer[]
+  topics           Topic[]
+}
+
+model AssistantOnMCPServer {
+  assistantId String
+  assistant   Assistant @relation(fields: [assistantId], references: [id])
+  serverId    String
+  server      MCPServer @relation(fields: [serverId], references: [id])
+
+  @@id([assistantId, serverId])
+}

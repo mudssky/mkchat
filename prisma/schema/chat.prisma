@@ -1,0 +1,25 @@
+// 4. 会话 (The Context)
+model Topic {
+  id          String    @id @default(cuid())
+  assistantId String
+  assistant   Assistant @relation(fields: [assistantId], references: [id])
+  messages    Message[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  title       String? // Auto-generated summary
+}
+
+// 5. 消息 (The Tree)
+model Message {
+  id        String   @id @default(cuid())
+  topicId   String
+  topic     Topic    @relation(fields: [topicId], references: [id])
+  content   String
+  role      String // user/assistant/system/tool
+  createdAt DateTime @default(now())
+
+  // Tree structure
+  parentId String?
+  parent   Message?  @relation("Tree", fields: [parentId], references: [id])
+  children Message[] @relation("Tree")
+}

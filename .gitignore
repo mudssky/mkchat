@@ -43,7 +43,9 @@ next-env.d.ts
 *.local.json
 # 使用rule-loader转换
 .agent/rules
-/src/generated/prisma
+
+# prisma生成的类型需要忽略
+prisma/generated
 
 # 忽略数据库文件
 *.db

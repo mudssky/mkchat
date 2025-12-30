@@ -1,0 +1,22 @@
+// 1. 供应商配置 (The Wallet)
+model ProviderConfig {
+  id         String      @id @default(cuid())
+  userId     String
+  user       User        @relation(fields: [userId], references: [id])
+  name       String
+  type       String // "openai", "anthropic", "google"
+  apiKey     String // Encrypted ideally, but plain for now/mvp
+  baseUrl    String?
+  assistants Assistant[]
+}
+
+// 2. MCP 服务器 (The Hands - SSE Only)
+model MCPServer {
+  id         String                 @id @default(cuid())
+  userId     String
+  user       User                   @relation(fields: [userId], references: [id])
+  name       String
+  url        String // SSE Endpoint
+  enabled    Boolean                @default(true)
+  assistants AssistantOnMCPServer[]
+}

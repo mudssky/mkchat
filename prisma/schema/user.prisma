@@ -1,0 +1,7 @@
+
+model User {
+  id              String           @id @default(cuid())
+  providerConfigs ProviderConfig[]
+  mcpServers      MCPServer[]
+  assistants      Assistant[]
+}
