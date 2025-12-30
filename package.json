@@ -18,7 +18,8 @@
     "prisma:studio-prod": "dotenv -e .env.production prisma studio --port 5655",
     "typecheck": "tsc --noEmit",
     "typecheck:fast": "tsgo --noEmit",
-    "qa": "pnpm typecheck:fast && pnpm lint && pnpm format:check"
+    "qa": "pnpm typecheck:fast && pnpm lint && pnpm format:check",
+    "setup:rules": "rule-loader  convert -t antigravity"
   },
   "dependencies": {
     "next": "16.1.1",
