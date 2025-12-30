@@ -7,7 +7,6 @@ export class ChatService {
    */
   async getTrace(leafMessageId: string): Promise<Message[]> {
     const trace: Message[] = [];
-    const currentId: string | null = leafMessageId;
 
     // Use a loop to traverse up.
     // Optimization: Recursive CTE is better in SQL, but for Prisma/SQLite loop is fine for reasonable depth.

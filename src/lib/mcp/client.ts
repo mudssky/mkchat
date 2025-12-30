@@ -31,6 +31,7 @@ export class MCPClient {
     return this.client.listTools();
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: MCP 工具参数是动态的，由具体工具定义
   async callTool(name: string, args: any) {
     return this.client.callTool({
       name,

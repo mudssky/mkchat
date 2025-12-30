@@ -32,7 +32,7 @@ export class MCPService {
     const tools: EnrichedTool[] = [];
 
     // Parallelize discovery?
-    const promises = assistant.mcpServers.map(async (rel: any) => {
+    const promises = assistant.mcpServers.map(async (rel) => {
       const { server } = rel;
       if (!server.enabled) return;
 
@@ -68,6 +68,7 @@ export class MCPService {
   /**
    * Executes a specific tool on the corresponding MCP server.
    */
+  // biome-ignore lint/suspicious/noExplicitAny: MCP 工具参数是动态的，由具体工具定义
   async executeTool(serverId: string, toolName: string, args: any) {
     const server = await prisma.mCPServer.findUnique({
       where: { id: serverId },
