@@ -7,7 +7,18 @@
     "build": "next build",
     "start": "next start",
     "lint": "biome check",
-    "format": "biome format --write"
+    "format": "biome format --write",
+    "format:check": "biome check --write .",
+    "prisma:format": "prisma format",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate-dev": "dotenv -e .env.development prisma migrate dev",
+    "prisma:migrate-prod": "dotenv -e .env.production prisma migrate deploy",
+    "prisma:seed-dev": "dotenv -e .env.development prisma db seed",
+    "prisma:studio-dev": "dotenv -e .env.development prisma studio --port 5555",
+    "prisma:studio-prod": "dotenv -e .env.production prisma studio --port 5655",
+    "typecheck": "tsc --noEmit",
+    "typecheck:fast": "tsgo --noEmit",
+    "qa": "pnpm typecheck:fast && pnpm lint && pnpm format:check"
   },
   "dependencies": {
     "next": "16.1.1",
