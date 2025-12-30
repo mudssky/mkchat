@@ -3,5 +3,4 @@ module.exports = {
     "biome check --write --no-errors-on-unmatched",
   ],
   "**/*.ts?(x)": () => "tsgo -p tsconfig.json --noEmit",
-  "src/**/*.{cjs,mjs,js,jsx,ts,tsx}": ["eslint --fix --max-warnings 0"],
 };
