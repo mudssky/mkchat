@@ -1,10 +1,12 @@
 # 📂 30_project_specific.md
 
 ## 🌟 Project Context
+
 **Name**: AI Agent Workbench (Web Edition)
 **Goal**: A Cherry Studio-like web application with Tree-based chat, decoupled Provider management, and Remote MCP tool integration.
 
 ## 🛠️ Core Stack
+
 - **Framework**: Next.js 16.1.1 (App Router)
 - **Language**: TypeScript 5+
 - **UI Library**: Ant Design X (AI Chat UI), React 19.2.3
@@ -18,22 +20,27 @@
   - LangChain.js
   - MCP SDK (@modelcontextprotocol/sdk)
 - **I18n**: next-intl
+- **Testing**: Vitest, Playwright, React Testing Library
 - **Linting/Formatting**: Biome
 
 ## 📜 Scripts
+
 | Command | Description |
 | :--- | :--- |
 | `pnpm dev` | Start development server |
 | `pnpm build` | Build for production |
 | `pnpm start` | Start production server |
+| `pnpm test` | Run Vitest unit tests |
+| `pnpm test:e2e` | Run Playwright E2E tests |
 | `pnpm lint` | Run Biome check |
 | `pnpm format` | Run Biome format |
 | `pnpm typecheck` | Run TypeScript check |
-| `pnpm qa` | Run typecheck, lint, and format check |
+| `pnpm qa` | Run typecheck, lint, format, and unit tests |
 | `pnpm prisma:generate` | Generate Prisma client |
 | `pnpm prisma:migrate-dev` | Run Prisma migrations (dev) |
 
 ## 📂 Directory Structure (ASCII)
+
 ```text
 src/
 ├── app/
@@ -63,7 +70,9 @@ src/
 ```
 
 ## 📏 Strictness Level
+
 **Level**: **High**
+
 - Every PR/Change must pass `pnpm qa`.
 - No `any` allowed.
 - No console logs in production code (use Pino).

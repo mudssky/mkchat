@@ -29,10 +29,40 @@
 
 ## 🧪 Testing & Verification
 
-- **Unit Tests**: Write tests for utilities and complex logic.
+| 测试层级 | 测试对象 | 策略 | 工具 | 推荐指数 |
+| :--- | :--- | :--- | :--- | :--- |
+| **纯逻辑/工具函数** | `utils/*.ts`, `hooks/*.ts` | **详细测试**。逻辑不容易变，且容易测，收益最高。 | Vitest | ⭐⭐⭐⭐⭐ |
+| **通用 UI 组件** | Button, Card, Navbar (Client) | **快照测试**。`expect(container).toMatchSnapshot()`。保证基础积木不崩。 | Vitest | ⭐⭐⭐⭐ |
+| **业务复杂组件** | 包含表单、复杂交互的组件 | **冒烟测试**。`render(<Comp />)` 保证能打开即可。 | Vitest | ⭐⭐⭐ |
+| **页面 (Pages)** | `app/**/page.tsx` | **E2E 测试**。只写一个脚本：打开页面 -> 检查关键元素。 | Playwright | ⭐⭐⭐⭐⭐ |
+
+### 🛠️ Test Template
+
+```tsx
+import { render } from '@testing-library/react'
+import { describe, it, expect, vi } from 'vitest'
+import TargetComponent from './TargetComponent'
+
+// 1. 如果组件用了 useRouter/useParams，先 Mock 掉
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
+  useSearchParams: () => ({ get: vi.fn() }),
+  usePathname: () => '',
+}))
+
+describe('TargetComponent', () => {
+  it('renders successfully', () => {
+    const { container } = render(<TargetComponent />)
+    expect(container).toBeTruthy()
+  })
+})
+```
+
+### ✅ Checks
 - **Linting**: Ensure `pnpm lint` (Biome) passes.
 - **Typecheck**: Ensure `pnpm typecheck` passes.
 - **Format**: Run `pnpm format` before committing.
+- **QA**: `pnpm qa` is the ultimate gateway.
 
 ## 📝 Naming Conventions
 
