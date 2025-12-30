@@ -43,3 +43,7 @@ next-env.d.ts
 *.local.json
 # 使用rule-loader转换
 .agent/rules
+/src/generated/prisma
+
+# 忽略数据库文件
+*.db
