@@ -1,7 +1,7 @@
-import { MCPClient } from '@/lib/mcp/client';
-import { prisma } from '@/lib/prisma';
-import logger from '@/lib/logger';
-import { Tool } from '@modelcontextprotocol/sdk/types.js';
+import type { Tool } from "@modelcontextprotocol/sdk/types.js";
+import logger from "@/lib/logger";
+import { MCPClient } from "@/lib/mcp/client";
+import { prisma } from "@/lib/prisma";
 
 export interface EnrichedTool extends Tool {
   serverId: string;
@@ -48,10 +48,15 @@ export class MCPService {
         }));
         tools.push(...serverTools);
       } catch (err) {
-        logger.error({ err, serverId: server.id, url: server.url }, 'Failed to list tools from MCP server');
+        logger.error(
+          { err, serverId: server.id, url: server.url },
+          "Failed to list tools from MCP server",
+        );
       } finally {
         if (client) {
-          await client.close().catch((e) => logger.error({ e }, 'Error closing MCP client'));
+          await client
+            .close()
+            .catch((e) => logger.error({ e }, "Error closing MCP client"));
         }
       }
     });
@@ -78,7 +83,7 @@ export class MCPService {
       const result = await client.callTool(toolName, args);
       return result;
     } catch (err) {
-      logger.error({ err, serverId, toolName }, 'Failed to execute tool');
+      logger.error({ err, serverId, toolName }, "Failed to execute tool");
       throw err;
     } finally {
       await client.close().catch(() => {});

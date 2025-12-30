@@ -1,6 +1,6 @@
-import { Client } from '@modelcontextprotocol/sdk/client/index.js';
-import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
-import logger from '@/lib/logger';
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse.js";
+import logger from "@/lib/logger";
 
 export class MCPClient {
   private client: Client;
@@ -12,12 +12,12 @@ export class MCPClient {
     this.transport = new SSEClientTransport(new URL(url));
     this.client = new Client(
       {
-        name: 'mkchat-web-client',
-        version: '1.0.0',
+        name: "mkchat-web-client",
+        version: "1.0.0",
       },
       {
         capabilities: {},
-      }
+      },
     );
   }
 

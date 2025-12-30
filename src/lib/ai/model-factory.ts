@@ -1,17 +1,17 @@
-import { createOpenAI } from '@ai-sdk/openai';
-import { createAnthropic } from '@ai-sdk/anthropic';
-import { ProviderConfig } from '@prisma/client';
+import { createAnthropic } from "@ai-sdk/anthropic";
+import { createOpenAI } from "@ai-sdk/openai";
+import type { ProviderConfig } from "@prisma/client";
 
 export function getModel(providerConfig: ProviderConfig, modelId: string) {
-  if (providerConfig.type === 'openai') {
+  if (providerConfig.type === "openai") {
     const openai = createOpenAI({
       apiKey: providerConfig.apiKey,
       baseURL: providerConfig.baseUrl || undefined,
     });
     return openai(modelId);
   }
-  
-  if (providerConfig.type === 'anthropic') {
+
+  if (providerConfig.type === "anthropic") {
     const anthropic = createAnthropic({
       apiKey: providerConfig.apiKey,
       baseURL: providerConfig.baseUrl || undefined,

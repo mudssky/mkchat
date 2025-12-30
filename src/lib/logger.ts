@@ -1,13 +1,13 @@
-import pino from 'pino';
+import pino from "pino";
 
-const logLevel = process.env.LOG_LEVEL || 'info';
+const logLevel = process.env.LOG_LEVEL || "info";
 
 const logger = pino({
   level: logLevel,
   transport:
-    process.env.NODE_ENV !== 'production'
+    process.env.NODE_ENV !== "production"
       ? {
-          target: 'pino-pretty',
+          target: "pino-pretty",
           options: {
             colorize: true,
           },
