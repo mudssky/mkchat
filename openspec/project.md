@@ -4,6 +4,7 @@
 
 **AI Agent Workbench (Web Edition)**
 一个类似于 Cherry Studio 的 Web 应用程序，具有基于 Tree 的聊天、解耦的 Provider 管理和远程 MCP 工具集成。
+ **所有 OpenSpec 文档（提案、任务、规格）必须使用简体中文编写。技术术语，代码变量等保持英文**
 
 ## Tech Stack
 
