@@ -3,15 +3,15 @@
 ## ADDED Requirements
 
 ### Requirement: Project Structure Initialization
-The project SHALL follow the defined directory structure in the PRD.
+项目应遵循 PRD 中定义的目录结构。
 
 #### Scenario: Developer inspects src folder
-- **When** `ls -R src` is run
-- **Then** the folders `app/(main)`, `components/ai-chat`, `lib/mcp` SHALL exist
+- **When** 运行 `ls -R src` 时
+- **Then** `app/(main)`, `components/ai-chat`, `lib/mcp` 等文件夹应存在
 
 ### Requirement: Tech Stack Dependencies
-Core dependencies MUST be installed.
+必须安装核心依赖项。
 
 #### Scenario: Checking package.json
-- **When** the developer checks dependencies
-- **Then** `prisma`, `@modelcontextprotocol/sdk`, `@langchain/core`, `ai`, `pino` SHALL be present
+- **When** 开发者检查依赖项时
+- **Then** `prisma`, `@modelcontextprotocol/sdk`, `@langchain/core`, `ai`, `pino` 应已安装

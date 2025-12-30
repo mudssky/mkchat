@@ -3,33 +3,41 @@
 ## ADDED Requirements
 
 ### Requirement: Provider Entity
-The system MUST store API keys and base URLs for providers.
+
+系统必须存储提供商的 API keys 和 base URLs。
 
 #### Scenario: Creating a provider config
-- **Given** a user wants to add DeepSeek
-- **When** saving the config
-- **Then** a `ProviderConfig` record SHALL be created with `type`, `apiKey`, and optional `baseUrl`
+
+- **Given** 用户想要添加 DeepSeek
+- **When** 保存配置时
+- **Then** 应创建一个 `ProviderConfig` 记录，包含 `type`, `apiKey` 和可选的 `baseUrl`
 
 ### Requirement: MCP Server Entity
-The system MUST store remote SSE endpoints.
+
+系统必须存储远程 SSE endpoints。
 
 #### Scenario: Adding a wrapper service
-- **Given** a URL `https://mcp.tool/sse`
-- **When** saving the MCP server
-- **Then** an `MCPServer` record SHALL be created
+
+- **Given** 一个 URL `https://mcp.tool/sse`
+- **When** 保存 MCP server 时
+- **Then** 应创建一个 `MCPServer` 记录
 
 ### Requirement: Assistant Composition
-The system MUST link Providers and MCPs to an Assistant.
+
+系统必须将 Providers 和 MCPs 链接到一个 Assistant。
 
 #### Scenario: Configuring an assistant
-- **Given** a Provider ID and multiple MCP Server IDs
-- **When** creating an Assistant
-- **Then** the Assistant record SHALL be linked to the Provider and have a many-to-many relation with MCP Servers
+
+- **Given** 一个 Provider ID 和多个 MCP Server IDs
+- **When** 创建一个 Assistant 时
+- **Then** Assistant 记录应链接到 Provider，并与 MCP Servers 建立多对多关系
 
 ### Requirement: Tree-based Message Model
-Messages MUST support recursive parent relationships.
+
+消息必须支持递归父子关系。
 
 #### Scenario: Storing a reply
-- **Given** a parent message ID
-- **When** a new message is saved
-- **Then** the `parentId` field SHALL reference the previous message
+
+- **Given** 一个父消息 ID
+- **When** 保存新消息时
+- **Then** `parentId` 字段应引用上一条消息

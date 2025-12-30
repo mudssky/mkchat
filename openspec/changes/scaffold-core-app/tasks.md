@@ -1,20 +1,20 @@
 ## 1. Implementation
 
-- [ ] 1.1 foundation: Initialize Project
-  - [ ] 1.1.1 Run `npm install` for core dependencies (`prisma`, `@modelcontextprotocol/sdk`, etc).
-  - [ ] 1.1.2 Create directory structure `src/app`, `src/lib`, `src/services`, `src/components`.
-  - [ ] 1.1.3 Configure `pino` logger.
-- [ ] 1.2 data: Implement Database Schema
-  - [ ] 1.2.1 Create `prisma/schema.prisma` with `User`, `ProviderConfig`, `MCPServer`, `Assistant`, `Topic`, `Message` models.
-  - [ ] 1.2.2 Run `prisma generate` and `prisma migrate dev`.
-  - [ ] 1.2.3 Verify database connection.
-- [ ] 1.3 mcp: Build MCP Client
-  - [ ] 1.3.1 Implement `lib/mcp/client.ts` for SSE connection handling.
-  - [ ] 1.3.2 Create `mcp-service` to manage active connections.
-  - [ ] 1.3.3 Add tool discovery logic.
-- [ ] 1.4 chat: Implement Chat Logic
-  - [ ] 1.4.1 Create `services/chat-service.ts`.
-  - [ ] 1.4.2 Implement `getTrace(leafId)` to build context window.
-  - [ ] 1.4.3 Implement `createMessage(content, parentId)` logic.
-- [ ] 1.5 api: Basic API Routes
-  - [ ] 1.5.1 Scaffold `app/api/chat/route.ts` (stub implementation connecting to Vercel AI SDK).
+- [x] 1.1 foundation: 初始化项目
+  - [x] 1.1.1 运行 `npm install` 安装核心依赖项 (`prisma`, `@modelcontextprotocol/sdk` 等)。
+  - [x] 1.1.2 创建目录结构 `src/app`, `src/lib`, `src/services`, `src/components`。
+  - [x] 1.1.3 配置 `pino` logger。
+- [x] 1.2 data: 实现数据库 Schema
+  - [x] 1.2.1 创建 `prisma/schema.prisma`，包含 `User`, `ProviderConfig`, `MCPServer`, `Assistant`, `Topic`, `Message` 模型。
+  - [x] 1.2.2 运行 `prisma generate` 和 `prisma migrate dev`。
+  - [x] 1.2.3 验证数据库连接。
+- [x] 1.3 mcp: 构建 MCP Client
+  - [x] 1.3.1 实现 `lib/mcp/client.ts` 用于处理 SSE 连接。
+  - [x] 1.3.2 创建 `mcp-service` 来管理活动连接。
+  - [x] 1.3.3 添加工具发现逻辑。
+- [x] 1.4 chat: 实现聊天逻辑
+  - [x] 1.4.1 创建 `services/chat-service.ts`。
+  - [x] 1.4.2 实现 `getTrace(leafId)` 以构建上下文窗口。
+  - [x] 1.4.3 实现 `createMessage(content, parentId)` 逻辑。
+- [x] 1.5 api: 基础 API 路由
+  - [x] 1.5.1 搭建 `app/api/chat/route.ts` (连接到 Vercel AI SDK 的存根实现)。

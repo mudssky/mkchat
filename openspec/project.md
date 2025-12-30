@@ -1,10 +1,12 @@
 # Project Context
 
 ## Purpose
+
 **AI Agent Workbench (Web Edition)**
-A Cherry Studio-like web application with Tree-based chat, decoupled Provider management, and Remote MCP tool integration.
+一个类似于 Cherry Studio 的 Web 应用程序，具有基于 Tree 的聊天、解耦的 Provider 管理和远程 MCP 工具集成。
 
 ## Tech Stack
+
 - **Framework**: Next.js 14+ (App Router)
 - **Language**: TypeScript
 - **UI & Styling**: Ant Design X, Tailwind CSS, cva
@@ -16,24 +18,29 @@ A Cherry Studio-like web application with Tree-based chat, decoupled Provider ma
 ## Project Conventions
 
 ### Code Style
-- Use `pnpm qa` for linting and formatting.
-- **Strictness**: High (No `any`, no console logs in prod).
-- Follow SOLID principles.
-- Use Server Components by default.
-- Functional components only.
+
+- 使用 `pnpm qa` 进行 linting 和格式化。
+- **Strictness**: High (不允许使用 `any`，生产环境中不允许 console logs)。
+- 遵循 SOLID 原则。
+- 默认使用 Server Components。
+- 仅使用 Functional components。
 
 ### Architecture Patterns
-- **Decoupled**: Provider, Assistants, and MCP Tools are separate entities.
-- **Tree-Structured Chat**: Messages support branching and history navigation.
-- **Web-Native**: SSE for remote MCP connections.
+
+- **Decoupled**: Provider, Assistants, 和 MCP Tools 是独立的实体。
+- **Tree-Structured Chat**: 消息支持分支和历史导航。
+- **Web-Native**: 使用 SSE 进行远程 MCP 连接。
 
 ### Directory Structure
-See `prd/init.md` or `src/` for the defined structure.
+
+参见 `prd/init.md` 或 `src/` 了解定义的结构。
 
 ## Important Constraints
-- **Database**: SQLite (local/embedded focus).
-- **Environment**: Desktop/Web usage.
+
+- **Database**: SQLite (专注于本地/嵌入式)。
+- **Environment**: Desktop/Web 使用。
 
 ## External Dependencies
-- OpenAI / Anthropic / Google APIs (User provided keys)
-- Remote MCP Servers (User provided URLs)
+
+- OpenAI / Anthropic / Google APIs (用户提供 keys)
+- Remote MCP Servers (用户提供 URLs)
