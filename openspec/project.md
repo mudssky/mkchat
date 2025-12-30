@@ -17,7 +17,7 @@
 
 - **Framework**: Next.js 14+ (App Router)
 - **Language**: TypeScript
-- **UI & Styling**: Ant Design X, Tailwind CSS, cva
+- **UI & Styling**: Ant Design X, Tailwind CSS, cva,shadcn-ui, lucide-react
 - **State**: TanStack Query (Server), Zustand (Client)
 - **Database**: SQLite with Prisma ORM
 - **AI**: Vercel AI SDK (Core + UI), LangChain.js
