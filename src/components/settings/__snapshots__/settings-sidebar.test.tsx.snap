@@ -1,0 +1,185 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`SettingsSidebar 组件 > 快照测试 > 应该匹配 MCP 工具页面的快照 1`] = `
+<div>
+  <aside
+    class="w-64 border-r border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950"
+  >
+    <nav
+      class="space-y-1"
+    >
+      <a
+        class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800/50 dark:hover:text-zinc-50"
+        href="/settings/general"
+      >
+        <span
+          class="text-lg"
+        >
+          ⚙️
+        </span>
+        通用设置
+      </a>
+      <a
+        class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800/50 dark:hover:text-zinc-50"
+        href="/settings/providers"
+      >
+        <span
+          class="text-lg"
+        >
+          🤖
+        </span>
+        模型提供商
+      </a>
+      <a
+        class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-50"
+        href="/settings/mcp"
+      >
+        <span
+          class="text-lg"
+        >
+          🔌
+        </span>
+        MCP 工具
+      </a>
+    </nav>
+  </aside>
+</div>
+`;
+
+exports[`SettingsSidebar 组件 > 快照测试 > 应该匹配带自定义 className 的快照 1`] = `
+<div>
+  <aside
+    class="w-64 border-r border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950 custom-class"
+  >
+    <nav
+      class="space-y-1"
+    >
+      <a
+        class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-50"
+        href="/settings/general"
+      >
+        <span
+          class="text-lg"
+        >
+          ⚙️
+        </span>
+        通用设置
+      </a>
+      <a
+        class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800/50 dark:hover:text-zinc-50"
+        href="/settings/providers"
+      >
+        <span
+          class="text-lg"
+        >
+          🤖
+        </span>
+        模型提供商
+      </a>
+      <a
+        class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800/50 dark:hover:text-zinc-50"
+        href="/settings/mcp"
+      >
+        <span
+          class="text-lg"
+        >
+          🔌
+        </span>
+        MCP 工具
+      </a>
+    </nav>
+  </aside>
+</div>
+`;
+
+exports[`SettingsSidebar 组件 > 快照测试 > 应该匹配提供商设置页面的快照 1`] = `
+<div>
+  <aside
+    class="w-64 border-r border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950"
+  >
+    <nav
+      class="space-y-1"
+    >
+      <a
+        class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800/50 dark:hover:text-zinc-50"
+        href="/settings/general"
+      >
+        <span
+          class="text-lg"
+        >
+          ⚙️
+        </span>
+        通用设置
+      </a>
+      <a
+        class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-50"
+        href="/settings/providers"
+      >
+        <span
+          class="text-lg"
+        >
+          🤖
+        </span>
+        模型提供商
+      </a>
+      <a
+        class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800/50 dark:hover:text-zinc-50"
+        href="/settings/mcp"
+      >
+        <span
+          class="text-lg"
+        >
+          🔌
+        </span>
+        MCP 工具
+      </a>
+    </nav>
+  </aside>
+</div>
+`;
+
+exports[`SettingsSidebar 组件 > 快照测试 > 应该匹配通用设置页面的快照 1`] = `
+<div>
+  <aside
+    class="w-64 border-r border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950"
+  >
+    <nav
+      class="space-y-1"
+    >
+      <a
+        class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-50"
+        href="/settings/general"
+      >
+        <span
+          class="text-lg"
+        >
+          ⚙️
+        </span>
+        通用设置
+      </a>
+      <a
+        class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800/50 dark:hover:text-zinc-50"
+        href="/settings/providers"
+      >
+        <span
+          class="text-lg"
+        >
+          🤖
+        </span>
+        模型提供商
+      </a>
+      <a
+        class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800/50 dark:hover:text-zinc-50"
+        href="/settings/mcp"
+      >
+        <span
+          class="text-lg"
+        >
+          🔌
+        </span>
+        MCP 工具
+      </a>
+    </nav>
+  </aside>
+</div>
+`;

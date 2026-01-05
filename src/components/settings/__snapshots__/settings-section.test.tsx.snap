@@ -1,0 +1,108 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`SettingsSection 组件 > 快照测试 > 应该匹配基础快照（只有标题） 1`] = `
+<div>
+  <section
+    class="space-y-6"
+  >
+    <div>
+      <h2
+        class="text-2xl font-semibold text-zinc-900 dark:text-zinc-50"
+      >
+        通用设置
+      </h2>
+    </div>
+    <div
+      class="space-y-6"
+    >
+      <div>
+        内容区域
+      </div>
+    </div>
+  </section>
+</div>
+`;
+
+exports[`SettingsSection 组件 > 快照测试 > 应该匹配带多个子元素的快照 1`] = `
+<div>
+  <section
+    class="space-y-6"
+  >
+    <div>
+      <h2
+        class="text-2xl font-semibold text-zinc-900 dark:text-zinc-50"
+      >
+        表单设置
+      </h2>
+    </div>
+    <div
+      class="space-y-6"
+    >
+      <input
+        placeholder="输入框 1"
+        type="text"
+      />
+      <input
+        placeholder="输入框 2"
+        type="text"
+      />
+      <button
+        type="button"
+      >
+        保存
+      </button>
+    </div>
+  </section>
+</div>
+`;
+
+exports[`SettingsSection 组件 > 快照测试 > 应该匹配带描述的快照 1`] = `
+<div>
+  <section
+    class="space-y-6"
+  >
+    <div>
+      <h2
+        class="text-2xl font-semibold text-zinc-900 dark:text-zinc-50"
+      >
+        通用设置
+      </h2>
+      <p
+        class="mt-1 text-sm text-zinc-600 dark:text-zinc-400"
+      >
+        管理您的账户和偏好设置
+      </p>
+    </div>
+    <div
+      class="space-y-6"
+    >
+      <div>
+        内容区域
+      </div>
+    </div>
+  </section>
+</div>
+`;
+
+exports[`SettingsSection 组件 > 快照测试 > 应该匹配带自定义 className 的快照 1`] = `
+<div>
+  <section
+    class="space-y-6 custom-class"
+  >
+    <div>
+      <h2
+        class="text-2xl font-semibold text-zinc-900 dark:text-zinc-50"
+      >
+        测试
+      </h2>
+    </div>
+    <div
+      class="space-y-6"
+    >
+      <div>
+        内容
+      </div>
+    </div>
+  </section>
+</div>
+`;

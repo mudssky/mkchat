@@ -1,10 +1,11 @@
+import React from "react";
 import { vi } from "vitest";
 
 // Mock Next.js Image component
 vi.mock("next/image", () => ({
   __esModule: true,
   default: (props: React.ImgHTMLAttributes<HTMLImageElement>) => {
-    // eslint-disable-next-line @next/next/no-img-element
+    // biome-ignore lint/performance/noImgElement: Mock 组件用于测试环境
     return React.createElement("img", { ...props, alt: props.alt ?? "" });
   },
 }));
