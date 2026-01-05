@@ -1,78 +1,44 @@
-# Proposal: implement-chat-ui
+# Change: implement-chat-ui
 
-## 概述
+## Why
 
-实现 AI Agent Workbench 的核心聊天界面，包括消息显示、输入组件、树状导航和流式响应处理。该界面将基于 Ant Design X 构建，支持树状消息结构的可视化和交互。
+当前项目已完成基础架构（foundation-setup）和数据建模（data-modeling），但缺少用户可见的聊天界面。用户无法与 AI 助手交互，也无法验证树状消息模型的核心功能。实现聊天 UI 是交付可用产品的关键里程碑。
 
-## 动机
+## What Changes
 
-当前项目已经完成了基础架构搭建（foundation-setup）和数据建模（data-modeling），但缺少用户可见的聊天界面。实现聊天 UI 是让用户能够与 AI 助手进行交互的关键步骤，也是验证现有数据模型和业务逻辑的重要里程碑。
+- **新增聊天页面**: 创建 `/chat/[topicId]` 路由，包含消息列表、输入框和导航组件
+- **消息渲染组件**: 基于 Ant Design X 实现 MessageBubble 和 MessageList，支持用户/AI 消息差异化显示
+- **流式响应集成**: 使用 Vercel AI SDK 的 `useChat` hook 处理 SSE 流式传输
+- **树状导航**: 实现分支指示器和分支选择器，支持在消息树的不同路径间切换
+- **状态管理**: 使用 TanStack Query 管理服务端数据，Zustand 管理客户端 UI 状态
+- **API 端点**: 创建 `GET /api/topics/[id]` 和 `POST /api/chat` 处理数据获取和消息发送
+- **响应式布局**: 适配桌面（≥768px）和移动端（<768px）屏幕尺寸
 
-## 目标
+## Impact
 
-1. **核心聊天界面**：实现基于 Ant Design X 的现代化聊天 UI，支持消息气泡、输入框和附件上传
-2. **树状消息导航**：可视化展示消息的分支结构，支持在不同分支间切换
-3. **流式响应处理**：集成 Vercel AI SDK，实现 AI 响应的实时流式显示
-4. **响应式布局**：适配桌面和移动端，提供优秀的用户体验
+**受影响的 specs**:
+- **chat-ui-components** (新增): 定义消息列表、气泡、输入框和导航组件的 UI 需求
+- **chat-streaming** (新增): 定义流式响应处理、错误处理和性能优化需求
+- **chat-core** (依赖): 使用现有的消息树遍历逻辑
+- **data-modeling** (依赖): 使用 Message 和 Topic 数据模型
 
-## 非目标
+**受影响的代码**:
+- `src/app/(main)/chat/[topicId]/page.tsx` - 新增聊天页面
+- `src/components/chat/*` - 新增所有聊天组件
+- `src/app/api/topics/[id]/route.ts` - 新增 Topic API
+- `src/app/api/chat/route.ts` - 新增 Chat API
+- `src/lib/chat/message-tree.ts` - 新增消息树工具函数
+- `src/store/chat-store.ts` - 新增聊天状态管理
+- `src/app/page.tsx` - 修改，添加聊天入口链接
 
-- MCP 工具集成（将在后续 change 中实现）
-- 助手配置界面（settings 相关功能）
-- 多模态消息（图片、文件等，初版仅支持文本）
-- 消息搜索和过滤功能
+**依赖关系**:
+- 依赖现有的 Prisma schema（Message, Topic, Assistant）
+- 依赖 Ant Design X、Vercel AI SDK、TanStack Query、Zustand
+- 为后续 MCP 工具集成提供 UI 基础
 
-## 影响范围
+**时间估算**: ~6 天（28.5 小时）
 
-### 新增组件
-- `src/components/chat/` - 聊天相关组件
-- `src/app/(main)/chat/[topicId]/` - 聊天页面
-
-### 修改文件
-- `src/app/page.tsx` - 添加导航到聊天页面的入口
-
-### 依赖关系
-- 依赖 `data-modeling` spec（Message, Topic 模型）
-- 依赖 `chat-core` spec（消息树遍历逻辑）
-- 为后续 MCP 集成提供 UI 基础
-
-## 风险与缓解
-
-### 风险 1: Ant Design X 学习曲线
-- **缓解**: 参考官方文档和示例，先实现基础功能再优化
-
-### 风险 2: 树状结构可视化复杂度
-- **缓解**: 初版使用简单的分支指示器，后续迭代优化交互体验
-
-### 风险 3: 流式响应性能
-- **缓解**: 使用 Vercel AI SDK 的优化方案，实现虚拟滚动（如需要）
-
-## 成功标准
-
-1. ✅ 用户可以在聊天界面发送消息并看到 AI 响应
-2. ✅ 消息以流式方式实时显示
-3. ✅ 用户可以编辑历史消息并创建新分支
-4. ✅ 用户可以在消息分支间导航
-5. ✅ 界面在桌面和移动端都有良好体验
-6. ✅ 所有核心组件都有单元测试覆盖
-
-## 时间估算
-
-- 设计和规划: 0.5 天
-- 核心组件开发: 2 天
-- 流式响应集成: 1 天
-- 树状导航实现: 1.5 天
-- 测试和优化: 1 天
-- **总计**: ~6 天
-
-## 替代方案
-
-### 方案 A: 使用 shadcn/ui 自建聊天组件
-- **优点**: 更灵活，完全可控
-- **缺点**: 开发时间长，需要处理更多细节
-- **决策**: 不采用，Ant Design X 专为 AI 聊天场景设计，更高效
-
-### 方案 B: 延迟实现树状导航
-- **优点**: 加快初版交付
-- **缺点**: 无法验证核心数据模型的关键特性
-- **决策**: 不采用，树状消息是项目核心特性之一
+**风险**:
+- Ant Design X 学习曲线 → 参考官方文档，先实现基础功能
+- 树状结构可视化复杂度 → 初版使用简单分支指示器
+- 流式响应性能 → 使用 Vercel AI SDK 优化方案和批量渲染
