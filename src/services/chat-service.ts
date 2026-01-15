@@ -1,5 +1,6 @@
-import type { Message } from "@prisma/client";
+import type { Message } from "@generated/client";
 import { prisma } from "@/lib/prisma";
+import type { ChatMessageRecordMetadata } from "@/types/chat";
 
 export class ChatService {
   /**
@@ -49,6 +50,7 @@ export class ChatService {
     role: string;
     topicId: string;
     parentId?: string | null;
+    metadata?: ChatMessageRecordMetadata | null;
   }) {
     return prisma.message.create({
       data: {
@@ -56,6 +58,7 @@ export class ChatService {
         role: data.role,
         topicId: data.topicId,
         parentId: data.parentId,
+        metadata: data.metadata ?? undefined,
       },
     });
   }

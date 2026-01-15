@@ -12,6 +12,7 @@
 
 # testing
 /coverage
+/test-results
 
 # next.js
 /.next/
@@ -49,3 +50,5 @@ prisma/generated
 
 # 忽略数据库文件
 *.db
+
+.pnpm-store

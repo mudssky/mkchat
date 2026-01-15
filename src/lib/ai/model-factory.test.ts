@@ -5,7 +5,7 @@
  * ROI: ⭐⭐⭐⭐ (纯逻辑，分支测试)
  */
 
-import type { ProviderConfig } from "@prisma/client";
+import type { ProviderConfig } from "@generated/client";
 import { describe, expect, it, vi } from "vitest";
 import { getModel } from "./model-factory";
 
@@ -136,7 +136,7 @@ describe("getModel", () => {
     it("应该为不支持的 provider 类型抛出错误", () => {
       const config: ProviderConfig = {
         ...mockProviderConfig,
-        type: "unknown" as string, // biome-ignore lint/suspicious/noExplicitAny: 测试错误处理
+        type: "unknown" as string,
       };
 
       expect(() => getModel(config, "model-id")).toThrow(
@@ -147,7 +147,7 @@ describe("getModel", () => {
     it("应该在错误消息中包含 provider 类型", () => {
       const config: ProviderConfig = {
         ...mockProviderConfig,
-        type: "custom-provider" as string, // biome-ignore lint/suspicious/noExplicitAny: 测试错误处理
+        type: "custom-provider" as string,
       };
 
       expect(() => getModel(config, "model-id")).toThrow(

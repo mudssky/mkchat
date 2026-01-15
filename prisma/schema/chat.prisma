@@ -16,6 +16,7 @@ model Message {
   topic     Topic    @relation(fields: [topicId], references: [id])
   content   String
   role      String // user/assistant/system/tool
+  metadata  Json?
   createdAt DateTime @default(now())
 
   // Tree structure

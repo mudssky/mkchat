@@ -23,8 +23,7 @@ describe("SettingsSidebar 组件", () => {
   it("应该能够成功渲染", () => {
     usePathname.mockReturnValue("/settings/general");
 
-    const { container } = render(<SettingsSidebar />);
-    expect(container).toBeTruthy();
+    expect(render(<SettingsSidebar />)).toBeTruthy();
   });
 
   // 🟡 快照测试
@@ -93,7 +92,7 @@ describe("SettingsSidebar 组件", () => {
     it("应该在通用设置页面高亮显示", () => {
       usePathname.mockReturnValue("/settings/general");
 
-      const { container } = render(<SettingsSidebar />);
+      render(<SettingsSidebar />);
 
       const generalLink = screen.getByText("通用设置").closest("a");
       expect(generalLink).toHaveClass("bg-zinc-100");
@@ -103,7 +102,7 @@ describe("SettingsSidebar 组件", () => {
     it("应该在提供商设置页面高亮显示", () => {
       usePathname.mockReturnValue("/settings/providers");
 
-      const { container } = render(<SettingsSidebar />);
+      render(<SettingsSidebar />);
 
       const providersLink = screen.getByText("模型提供商").closest("a");
       expect(providersLink).toHaveClass("bg-zinc-100");
@@ -113,7 +112,7 @@ describe("SettingsSidebar 组件", () => {
     it("应该在 MCP 工具页面高亮显示", () => {
       usePathname.mockReturnValue("/settings/mcp");
 
-      const { container } = render(<SettingsSidebar />);
+      render(<SettingsSidebar />);
 
       const mcpLink = screen.getByText("MCP 工具").closest("a");
       expect(mcpLink).toHaveClass("bg-zinc-100");
@@ -123,7 +122,7 @@ describe("SettingsSidebar 组件", () => {
     it("应该不激活不匹配的页面", () => {
       usePathname.mockReturnValue("/settings/general");
 
-      const { container } = render(<SettingsSidebar />);
+      render(<SettingsSidebar />);
 
       const providersLink = screen.getByText("模型提供商").closest("a");
       expect(providersLink).not.toHaveClass("bg-zinc-100");
@@ -133,7 +132,7 @@ describe("SettingsSidebar 组件", () => {
     it("应该处理子路径激活", () => {
       usePathname.mockReturnValue("/settings/providers/edit/123");
 
-      const { container } = render(<SettingsSidebar />);
+      render(<SettingsSidebar />);
 
       const providersLink = screen.getByText("模型提供商").closest("a");
       expect(providersLink).toHaveClass("bg-zinc-100");
@@ -144,7 +143,7 @@ describe("SettingsSidebar 组件", () => {
     it("应该正确设置 href 属性", () => {
       usePathname.mockReturnValue("/settings/general");
 
-      const { container } = render(<SettingsSidebar />);
+      render(<SettingsSidebar />);
 
       const generalLink = screen.getByText("通用设置").closest("a");
       expect(generalLink).toHaveAttribute("href", "/settings/general");
@@ -193,7 +192,7 @@ describe("SettingsSidebar 组件", () => {
     it("应该在激活状态应用深色模式样式", () => {
       usePathname.mockReturnValue("/settings/general");
 
-      const { container } = render(<SettingsSidebar />);
+      render(<SettingsSidebar />);
 
       const activeLink = screen.getByText("通用设置").closest("a");
       expect(activeLink).toHaveClass("dark:bg-zinc-800");
@@ -203,7 +202,7 @@ describe("SettingsSidebar 组件", () => {
     it("应该在非激活状态应用深色模式样式", () => {
       usePathname.mockReturnValue("/settings/general");
 
-      const { container } = render(<SettingsSidebar />);
+      render(<SettingsSidebar />);
 
       const inactiveLink = screen.getByText("模型提供商").closest("a");
       expect(inactiveLink).toHaveClass("dark:text-zinc-400");
@@ -212,7 +211,7 @@ describe("SettingsSidebar 组件", () => {
 
   describe("边界情况", () => {
     it("应该处理 pathname 为 undefined 的情况", () => {
-      usePathname.mockReturnValue(undefined as any);
+      usePathname.mockReturnValue(undefined as unknown as string);
 
       const { container } = render(<SettingsSidebar />);
 

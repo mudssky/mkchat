@@ -1,6 +1,6 @@
 import { createAnthropic } from "@ai-sdk/anthropic";
 import { createOpenAI } from "@ai-sdk/openai";
-import type { ProviderConfig } from "@prisma/client";
+import type { ProviderConfig } from "@generated/client";
 
 export function getModel(providerConfig: ProviderConfig, modelId: string) {
   if (providerConfig.type === "openai") {

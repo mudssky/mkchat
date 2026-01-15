@@ -1,18 +1,114 @@
-import { streamText, tool } from "ai";
+import { type ModelMessage, streamText, type ToolSet, tool } from "ai";
 import { z } from "zod";
 import { getModel } from "@/lib/ai/model-factory";
+import { isValidTopicId } from "@/lib/chat/topic-id";
 import logger from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
 import { chatService } from "@/services/chat-service";
 import { mcpService } from "@/services/mcp-service";
+import type { ChatMessageMetadata } from "@/types/chat";
 
 export const maxDuration = 60;
 
+const uiPartSchema = z
+  .object({
+    type: z.string(),
+  })
+  .passthrough();
+
+const uiMessageSchema = z
+  .object({
+    id: z.string(),
+    role: z.enum(["system", "user", "assistant"]),
+    parts: z.array(uiPartSchema),
+    metadata: z.unknown().optional(),
+  })
+  .passthrough();
+
+const requestSchema = z.object({
+  topicId: z.string(),
+  assistantId: z.string(),
+  parentId: z.string().nullable().optional(),
+  message: z.string().optional(),
+  messages: z.array(uiMessageSchema).optional(),
+});
+
+type UiMessagePayload = z.infer<typeof uiMessageSchema>;
+
+interface UserMessageExtraction {
+  content: string;
+  uiMessageId: string;
+}
+
+function extractUserMessage(
+  messages?: UiMessagePayload[],
+): UserMessageExtraction | null {
+  if (!messages || messages.length === 0) return null;
+  const lastUser = [...messages].reverse().find((msg) => msg.role === "user");
+  if (!lastUser) return null;
+
+  const text = lastUser.parts
+    .map((part) => {
+      if (part.type === "text" && typeof part.text === "string") {
+        return part.text;
+      }
+      if (part.type === "reasoning" && typeof part.text === "string") {
+        return part.text;
+      }
+      return "";
+    })
+    .join("");
+
+  if (!text.trim()) return null;
+
+  return { content: text, uiMessageId: lastUser.id };
+}
+
+function toModelMessages(
+  messages: Awaited<ReturnType<typeof chatService.getTrace>>,
+) {
+  const modelMessages: ModelMessage[] = [];
+
+  for (const message of messages) {
+    const role =
+      message.role === "user"
+        ? "user"
+        : message.role === "system"
+          ? "system"
+          : "assistant";
+    modelMessages.push({
+      role,
+      content: message.content,
+    });
+  }
+
+  return modelMessages;
+}
+
 export async function POST(req: Request) {
   try {
-    const { message, parentId, topicId, assistantId } = await req.json();
+    const payload = await req.json();
+    const parsed = requestSchema.safeParse(payload);
+    if (!parsed.success) {
+      return Response.json({ error: "Invalid request" }, { status: 400 });
+    }
 
-    // 1. Get Assistant & Config
+    const { topicId, assistantId, parentId, message, messages } = parsed.data;
+
+    if (!isValidTopicId(topicId)) {
+      return Response.json({ error: "Invalid topic id" }, { status: 404 });
+    }
+
+    const extracted = message
+      ? { content: message, uiMessageId: "" }
+      : extractUserMessage(messages);
+    if (!extracted) {
+      return Response.json(
+        { error: "Missing message content" },
+        { status: 400 },
+      );
+    }
+
     const assistant = await prisma.assistant.findUnique({
       where: { id: assistantId },
       include: { providerConfig: true },
@@ -22,32 +118,24 @@ export async function POST(req: Request) {
       return new Response("Assistant or Provider not found", { status: 404 });
     }
 
-    // 2. Save User Message
     const userMsg = await chatService.createMessage({
-      content: message,
+      content: extracted.content,
       role: "user",
-      topicId: topicId,
+      topicId,
       parentId,
     });
 
-    // 3. Build Context
     const dbMessages = await chatService.getTrace(userMsg.id);
-
-    // 4. Get Model
     const model = getModel(assistant.providerConfig, assistant.modelId);
 
-    // 5. Get Tools
     const enrichedTools = await mcpService.getToolsForAssistant(assistantId);
+    const tools: ToolSet = {};
 
-    // Use 'any' to bypass strict Zod/Tool inference issues in scaffold
-    // biome-ignore lint/suspicious/noExplicitAny: Vercel AI SDK tool 类型推断限制
-    const tools: Record<string, any> = {};
     for (const enrichedTool of enrichedTools) {
       tools[enrichedTool.name] = tool({
         description: enrichedTool.description,
-        parameters: z.object({}).passthrough(),
-        // biome-ignore lint/suspicious/noExplicitAny: MCP 工具参数是动态的
-        execute: async (args: any) => {
+        inputSchema: z.object({}).passthrough(),
+        execute: async (args: Record<string, unknown>) => {
           logger.info({ tool: enrichedTool.name, args }, "Executing Tool");
           return mcpService.executeTool(
             enrichedTool.serverId,
@@ -55,23 +143,37 @@ export async function POST(req: Request) {
             args,
           );
         },
-        // biome-ignore lint/suspicious/noExplicitAny: Vercel AI SDK tool 类型推断限制
-      } as any);
+      });
     }
 
-    // 6. Stream
-    const result = streamText({
+    let partialText = "";
+    let didAbort = false;
+
+    const stream = streamText({
       model,
       system: assistant.systemPrompt || undefined,
-      messages: dbMessages.map((m) => ({
-        // biome-ignore lint/suspicious/noExplicitAny: Vercel AI SDK 消息角色类型不匹配
-        role: m.role as any,
-        content: m.content,
-        // biome-ignore lint/suspicious/noExplicitAny: Vercel AI SDK CoreMessage 类型不匹配
-      })) as any[],
+      messages: toModelMessages(dbMessages),
       tools,
-      // maxSteps: 5, // Removed to satisfy type check in scaffold
+      onChunk: ({ chunk }) => {
+        if (chunk.type === "text-delta") {
+          partialText += chunk.text;
+        }
+      },
+      onAbort: async () => {
+        didAbort = true;
+        const content = partialText.trim();
+        if (!content) return;
+
+        await chatService.createMessage({
+          content,
+          role: "assistant",
+          topicId,
+          parentId: userMsg.id,
+          metadata: { incomplete: true, stopped: true },
+        });
+      },
       onFinish: async ({ text }) => {
+        if (didAbort) return;
         if (text) {
           await chatService.createMessage({
             content: text,
@@ -83,8 +185,15 @@ export async function POST(req: Request) {
       },
     });
 
-    // biome-ignore lint/suspicious/noExplicitAny: toDataStreamResponse 返回类型未导出
-    return (result as any).toDataStreamResponse();
+    const assistantMetadata: ChatMessageMetadata = {
+      topicId,
+      parentId: extracted.uiMessageId || userMsg.id,
+      createdAt: new Date().toISOString(),
+    };
+
+    return stream.toUIMessageStreamResponse({
+      messageMetadata: () => assistantMetadata,
+    });
   } catch (error) {
     logger.error({ error }, "Chat API Error");
     return new Response(JSON.stringify({ error: "Internal Server Error" }), {

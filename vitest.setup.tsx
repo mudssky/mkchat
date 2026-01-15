@@ -5,7 +5,6 @@ import { vi } from "vitest";
 vi.mock("next/image", () => ({
   __esModule: true,
   default: (props: React.ImgHTMLAttributes<HTMLImageElement>) => {
-    // biome-ignore lint/performance/noImgElement: Mock 组件用于测试环境
     return React.createElement("img", { ...props, alt: props.alt ?? "" });
   },
 }));
