@@ -10,6 +10,7 @@ interface TopBarProps {
   status?: {
     label: string;
     tone?: StatusTone;
+    icon?: ReactNode;
   };
   actions?: ReactNode;
 }
@@ -57,10 +58,15 @@ export function TopBar({
           {status ? (
             <span
               className={cn(
-                "rounded-full border px-3 py-1 text-xs font-medium",
+                "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium",
                 statusToneStyles[tone],
               )}
             >
+              {status.icon ? (
+                <span className="flex h-3.5 w-3.5 items-center justify-center">
+                  {status.icon}
+                </span>
+              ) : null}
               {status.label}
             </span>
           ) : null}

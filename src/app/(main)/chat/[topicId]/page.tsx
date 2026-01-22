@@ -1,4 +1,5 @@
 import type { Prisma } from "@generated/client";
+import { AlertTriangle, CheckCircle2 } from "lucide-react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ChatContainer } from "@/components/chat/ChatContainer";
@@ -72,10 +73,22 @@ export default async function ChatPage({ params }: Props) {
   const assistantInitial = assistantName ? assistantName[0] : "?";
 
   const modelStatus = !topic.assistant
-    ? { label: "模型状态：异常", tone: "warning" as const }
+    ? {
+        label: "模型状态：异常",
+        tone: "warning" as const,
+        icon: <AlertTriangle className="h-3.5 w-3.5" />,
+      }
     : topic.assistant.providerConfigId
-      ? { label: `模型：${topic.assistant.modelId}`, tone: "success" as const }
-      : { label: "模型状态：未配置", tone: "warning" as const };
+      ? {
+          label: `模型：${topic.assistant.modelId}`,
+          tone: "success" as const,
+          icon: <CheckCircle2 className="h-3.5 w-3.5" />,
+        }
+      : {
+          label: "模型状态：未配置",
+          tone: "warning" as const,
+          icon: <AlertTriangle className="h-3.5 w-3.5" />,
+        };
 
   return (
     <div className="flex flex-1 flex-col">
