@@ -99,7 +99,7 @@ export default function Home() {
                 ].map((feature) => (
                   <MotionItem
                     key={feature.title}
-                    className="group rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm transition duration-500 ease-out hover:-translate-y-1 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
+                    className="group rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm transition duration-500 ease-out hover:-translate-y-1 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
                   >
                     <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-zinc-900 text-white transition duration-500 ease-out group-hover:-translate-y-0.5 group-hover:scale-[1.03] dark:bg-zinc-100 dark:text-zinc-900">
                       <feature.icon className="h-5 w-5" />
@@ -115,7 +115,7 @@ export default function Home() {
               </section>
 
               <MotionItem className="grid gap-6 md:grid-cols-[1.2fr_1fr]">
-                <div className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+                <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
                   <div className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">
                     下一步
                   </div>
@@ -143,7 +143,7 @@ export default function Home() {
                     </li>
                   </ol>
                 </div>
-                <div className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+                <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
                   <div className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">
                     快捷入口
                   </div>
