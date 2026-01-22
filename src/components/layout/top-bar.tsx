@@ -1,3 +1,4 @@
+import { Tooltip } from "antd";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
@@ -11,6 +12,7 @@ interface TopBarProps {
     label: string;
     tone?: StatusTone;
     icon?: ReactNode;
+    tooltip?: string;
   };
   actions?: ReactNode;
 }
@@ -56,19 +58,21 @@ export function TopBar({
         </div>
         <div className="flex items-center gap-3">
           {status ? (
-            <span
-              className={cn(
-                "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium",
-                statusToneStyles[tone],
-              )}
-            >
-              {status.icon ? (
-                <span className="flex h-3.5 w-3.5 items-center justify-center">
-                  {status.icon}
-                </span>
-              ) : null}
-              {status.label}
-            </span>
+            <Tooltip title={status.tooltip}>
+              <span
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium",
+                  statusToneStyles[tone],
+                )}
+              >
+                {status.icon ? (
+                  <span className="flex h-3.5 w-3.5 items-center justify-center">
+                    {status.icon}
+                  </span>
+                ) : null}
+                {status.label}
+              </span>
+            </Tooltip>
           ) : null}
           {actions ? (
             <div className="flex items-center gap-2">{actions}</div>

@@ -77,17 +77,20 @@ export default async function ChatPage({ params }: Props) {
         label: "模型状态：异常",
         tone: "warning" as const,
         icon: <AlertTriangle className="h-3.5 w-3.5" />,
+        tooltip: "助手信息缺失，无法判断模型状态。",
       }
     : topic.assistant.providerConfigId
       ? {
           label: `模型：${topic.assistant.modelId}`,
           tone: "success" as const,
           icon: <CheckCircle2 className="h-3.5 w-3.5" />,
+          tooltip: "已配置模型提供商。",
         }
       : {
           label: "模型状态：未配置",
           tone: "warning" as const,
           icon: <AlertTriangle className="h-3.5 w-3.5" />,
+          tooltip: "尚未绑定模型提供商。",
         };
 
   return (
