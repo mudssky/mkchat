@@ -71,15 +71,11 @@ export default async function ChatPage({ params }: Props) {
   const topicTitle = topic.title?.trim() || "未命名对话";
   const assistantInitial = assistantName ? assistantName[0] : "?";
 
-  const modelStatus = topic.assistant?.providerConfigId
-    ? {
-        label: `模型：${topic.assistant.modelId}`,
-        tone: "info" as const,
-      }
-    : {
-        label: "模型状态：未配置",
-        tone: "warning" as const,
-      };
+  const modelStatus = !topic.assistant
+    ? { label: "模型状态：异常", tone: "warning" as const }
+    : topic.assistant.providerConfigId
+      ? { label: `模型：${topic.assistant.modelId}`, tone: "success" as const }
+      : { label: "模型状态：未配置", tone: "warning" as const };
 
   return (
     <div className="flex flex-1 flex-col">
