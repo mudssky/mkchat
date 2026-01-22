@@ -77,7 +77,7 @@ export default function Home() {
                 </div>
               </MotionItem>
 
-              <MotionItem className="grid gap-6 md:grid-cols-3">
+              <section className="grid gap-6 md:grid-cols-3">
                 {[
                   {
                     title: "清晰的协作结构",
@@ -97,11 +97,11 @@ export default function Home() {
                     icon: Sparkles,
                   },
                 ].map((feature) => (
-                  <div
+                  <MotionItem
                     key={feature.title}
-                    className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm transition duration-500 ease-out hover:-translate-y-1 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
+                    className="group rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm transition duration-500 ease-out hover:-translate-y-1 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
                   >
-                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-zinc-900 text-white transition duration-500 ease-out group-hover:-translate-y-0.5 group-hover:scale-[1.03] dark:bg-zinc-100 dark:text-zinc-900">
                       <feature.icon className="h-5 w-5" />
                     </div>
                     <div className="mt-4 text-lg font-semibold text-zinc-900 dark:text-zinc-100">
@@ -110,9 +110,9 @@ export default function Home() {
                     <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
                       {feature.description}
                     </p>
-                  </div>
+                  </MotionItem>
                 ))}
-              </MotionItem>
+              </section>
 
               <MotionItem className="grid gap-6 md:grid-cols-[1.2fr_1fr]">
                 <div className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
