@@ -23,15 +23,15 @@ export default function Home() {
                 <div className="relative flex flex-col gap-6">
                   <div className="inline-flex w-fit items-center gap-2 rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-semibold text-zinc-600 shadow-sm dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-300">
                     <Sparkles className="h-3.5 w-3.5" />
-                    温暖 / 科技
+                    温暖与科技并存
                   </div>
                   <div className="space-y-3">
-                    <h1 className="text-3xl font-semibold leading-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
-                      AI Agent Workbench
-                    </h1>
-                    <p className="max-w-2xl text-base leading-7 text-zinc-600 dark:text-zinc-300">
-                      统一管理多模型助手与 MCP
-                      工具，把对话整理成可追踪、可分支的知识路径。
+                  <h1 className="text-4xl font-semibold leading-tight text-zinc-900 dark:text-zinc-100 sm:text-5xl">
+                    AI Agent Workbench
+                  </h1>
+                    <p className="max-w-2xl text-lg leading-8 text-zinc-600 dark:text-zinc-300">
+                      用树状结构管理多模型对话与 MCP
+                      工具，把每次探索整理成可回溯的知识路径。
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-3">
@@ -119,9 +119,9 @@ export default function Home() {
                   <div className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">
                     下一步
                   </div>
-                  <h2 className="mt-3 text-xl font-semibold text-zinc-900 dark:text-zinc-100">
-                    用 3 分钟完成首次配置
-                  </h2>
+                    <h2 className="mt-3 text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
+                      用 3 分钟完成首次配置
+                    </h2>
                   <ol className="mt-4 space-y-3 text-sm text-zinc-600 dark:text-zinc-300">
                     <li className="flex items-start gap-3">
                       <span className="mt-0.5 flex h-6 w-6 items-center justify-center rounded-full bg-zinc-100 text-xs font-semibold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-200">
