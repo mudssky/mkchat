@@ -389,24 +389,22 @@ export function ChatContainer({ topicId, assistantName }: ChatContainerProps) {
 
       {!isLoading && !isError ? (
         <div className="flex flex-1 flex-col">
-          <div className="flex-1 px-4 py-6 sm:px-6">
-            <div className="mx-auto flex w-full max-w-[800px] flex-1 flex-col">
-              <MessageList
-                messages={displayMessages}
-                currentLeafId={currentLeafId}
-                assistantName={assistantName}
-                pendingUserMessageId={pendingUserMessageId}
-                streamingMessageId={streamingMessageId}
-                showThinkingIndicator={showThinkingIndicator}
-                stoppedMessageId={stoppedMessageId}
-                onSelectLeaf={handleSelectLeaf}
-                onEditMessage={handleEdit}
-              />
-            </div>
+          <div className="flex-1">
+            <MessageList
+              messages={displayMessages}
+              currentLeafId={currentLeafId}
+              assistantName={assistantName}
+              pendingUserMessageId={pendingUserMessageId}
+              streamingMessageId={streamingMessageId}
+              showThinkingIndicator={showThinkingIndicator}
+              stoppedMessageId={stoppedMessageId}
+              onSelectLeaf={handleSelectLeaf}
+              onEditMessage={handleEdit}
+            />
           </div>
 
           <div className="border-t border-zinc-200 bg-white px-4 py-4 dark:border-zinc-800 dark:bg-zinc-900 sm:px-6">
-            <div className="mx-auto flex w-full max-w-[800px] flex-col gap-3">
+            <div className="flex w-full flex-col gap-3">
               {connectionError || chatError ? (
                 <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-600 dark:border-red-800 dark:bg-red-950/40 dark:text-red-200">
                   {connectionError ?? chatError?.message}
