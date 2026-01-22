@@ -1,5 +1,5 @@
 import path from "node:path";
-import type { PrismaClient } from "@generated/client";
+import { PrismaClient } from "@generated/client";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import logger from "@/lib/logger";
 
@@ -36,10 +36,8 @@ const createPrismaClient = (): PrismaClientWithLogs => {
   if (process.env.DATABASE_URL !== databaseUrl) {
     process.env.DATABASE_URL = databaseUrl;
   }
-  const { PrismaClient: PrismaClientConstructor } =
-    require("@generated/client") as typeof import("@generated/client");
   const adapter = new PrismaBetterSqlite3({ url: databaseUrl });
-  return new PrismaClientConstructor({
+  return new PrismaClient({
     adapter,
     log: ["query", "error", "warn"],
   });
