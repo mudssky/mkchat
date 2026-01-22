@@ -26,9 +26,9 @@ export default function Home() {
                     温暖与科技并存
                   </div>
                   <div className="space-y-3">
-                  <h1 className="text-4xl font-semibold leading-tight text-zinc-900 dark:text-zinc-100 sm:text-5xl">
-                    AI Agent Workbench
-                  </h1>
+                    <h1 className="text-4xl font-semibold leading-tight text-zinc-900 dark:text-zinc-100 sm:text-5xl">
+                      AI Agent Workbench
+                    </h1>
                     <p className="max-w-2xl text-lg leading-8 text-zinc-600 dark:text-zinc-300">
                       用树状结构管理多模型对话与 MCP
                       工具，把每次探索整理成可回溯的知识路径。
@@ -104,7 +104,7 @@ export default function Home() {
                     <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-zinc-900 text-white transition duration-500 ease-out group-hover:-translate-y-0.5 group-hover:scale-[1.03] dark:bg-zinc-100 dark:text-zinc-900">
                       <feature.icon className="h-5 w-5" />
                     </div>
-                    <div className="mt-4 text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+                    <div className="mt-4 text-base font-semibold leading-6 text-zinc-900 dark:text-zinc-100">
                       {feature.title}
                     </div>
                     <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
@@ -119,10 +119,10 @@ export default function Home() {
                   <div className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">
                     下一步
                   </div>
-                    <h2 className="mt-3 text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
-                      用 3 分钟完成首次配置
-                    </h2>
-                  <ol className="mt-4 space-y-3 text-sm text-zinc-600 dark:text-zinc-300">
+                  <h2 className="mt-3 text-xl font-semibold leading-7 text-zinc-900 dark:text-zinc-100">
+                    用 3 分钟完成首次配置
+                  </h2>
+                  <ol className="mt-4 space-y-3 text-sm leading-6 text-zinc-600 dark:text-zinc-300">
                     <li className="flex items-start gap-3">
                       <span className="mt-0.5 flex h-6 w-6 items-center justify-center rounded-full bg-zinc-100 text-xs font-semibold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-200">
                         1
@@ -150,7 +150,7 @@ export default function Home() {
                   <div className="mt-4 flex flex-col gap-3">
                     <Link
                       href="/conversations"
-                      className="flex items-center justify-between rounded-2xl border border-zinc-200 px-4 py-3 text-sm font-semibold text-zinc-700 transition hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-200 dark:hover:border-zinc-600 dark:hover:text-zinc-50"
+                      className="flex items-center justify-between rounded-2xl border border-zinc-200 px-4 py-3 text-sm font-semibold leading-6 text-zinc-700 transition hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-200 dark:hover:border-zinc-600 dark:hover:text-zinc-50"
                     >
                       会话列表
                       <span className="text-xs text-zinc-400">
@@ -159,7 +159,7 @@ export default function Home() {
                     </Link>
                     <Link
                       href="/settings/general"
-                      className="flex items-center justify-between rounded-2xl border border-zinc-200 px-4 py-3 text-sm font-semibold text-zinc-700 transition hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-200 dark:hover:border-zinc-600 dark:hover:text-zinc-50"
+                      className="flex items-center justify-between rounded-2xl border border-zinc-200 px-4 py-3 text-sm font-semibold leading-6 text-zinc-700 transition hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-200 dark:hover:border-zinc-600 dark:hover:text-zinc-50"
                     >
                       通用设置
                       <span className="text-xs text-zinc-400">
@@ -168,7 +168,7 @@ export default function Home() {
                     </Link>
                     <Link
                       href="/settings/providers"
-                      className="flex items-center justify-between rounded-2xl border border-zinc-200 px-4 py-3 text-sm font-semibold text-zinc-700 transition hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-200 dark:hover:border-zinc-600 dark:hover:text-zinc-50"
+                      className="flex items-center justify-between rounded-2xl border border-zinc-200 px-4 py-3 text-sm font-semibold leading-6 text-zinc-700 transition hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-200 dark:hover:border-zinc-600 dark:hover:text-zinc-50"
                     >
                       模型提供商
                       <span className="text-xs text-zinc-400">
