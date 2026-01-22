@@ -2,6 +2,8 @@ import type { Prisma } from "@generated/client";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ChatContainer } from "@/components/chat/ChatContainer";
+import { TopBar } from "@/components/layout/top-bar";
+import { TopBarActions } from "@/components/layout/top-bar-actions";
 import { isValidTopicId } from "@/lib/chat/topic-id";
 import { logPrismaError, prisma, prismaDebugEnabled } from "@/lib/prisma";
 
@@ -63,29 +65,16 @@ export default async function ChatPage({ params }: Props) {
   const assistantInitial = assistantName ? assistantName[0] : "?";
 
   return (
-    <div className="flex min-h-screen flex-col bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50">
-      <header className="border-b border-zinc-200 bg-white px-6 py-4 dark:border-zinc-800 dark:bg-zinc-900">
-        <div className="mx-auto flex w-full max-w-[800px] items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full border border-zinc-200 bg-zinc-50 text-sm font-semibold text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
-              {assistantInitial}
-            </div>
-            <div>
-              <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                {assistantName}
-              </div>
-              <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
-                Chat
-              </div>
-            </div>
-          </div>
-          <div className="text-sm text-zinc-600 dark:text-zinc-300">
-            {topicId}
-          </div>
-        </div>
-      </header>
+    <div className="flex flex-1 flex-col">
+      <TopBar
+        title={assistantName}
+        subtitle={`会话 · ${topicId}`}
+        leading={assistantInitial}
+        status={{ label: "模型状态：未知", tone: "neutral" }}
+        actions={<TopBarActions />}
+      />
       <main className="flex flex-1 flex-col">
-        <div className="mx-auto flex w-full max-w-[800px] flex-1 flex-col">
+        <div className="mx-auto flex w-full max-w-[800px] flex-1 flex-col px-4 py-6 sm:px-6">
           <ChatContainer topicId={topicId} assistantName={assistantName} />
         </div>
       </main>
