@@ -1,0 +1,30 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`StatusBadge 组件 > 应该匹配快照 1`] = `
+<div>
+  <div
+    class="space-y-2"
+  >
+    <span
+      class="inline-flex items-center gap-1.5 rounded-full border font-medium border-zinc-200 bg-zinc-50 text-zinc-600 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 px-3 py-1 text-xs"
+    >
+      默认
+    </span>
+    <span
+      class="inline-flex items-center gap-1.5 rounded-full border font-medium border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200 px-3 py-1 text-xs"
+    >
+      成功
+    </span>
+    <span
+      class="inline-flex items-center gap-1.5 rounded-full border font-medium border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200 px-2 py-0.5 text-[11px]"
+    >
+      警告
+    </span>
+    <span
+      class="inline-flex items-center gap-1.5 rounded-full border font-medium border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-200 px-3 py-1 text-xs"
+    >
+      信息
+    </span>
+  </div>
+</div>
+`;
