@@ -37,13 +37,13 @@ export default function Home() {
                   <div className="flex flex-wrap gap-3">
                     <Link
                       href="/conversations"
-                      className="inline-flex items-center justify-center rounded-full bg-zinc-900 px-5 py-2 text-sm font-semibold text-white transition hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+                      className="inline-flex items-center justify-center rounded-xl bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
                     >
                       进入会话列表
                     </Link>
                     <Link
                       href="/settings/general"
-                      className="inline-flex items-center justify-center rounded-full border border-zinc-200 bg-white px-5 py-2 text-sm font-semibold text-zinc-700 transition hover:border-zinc-300 hover:text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:border-zinc-500 dark:hover:text-zinc-50"
+                      className="inline-flex items-center justify-center rounded-xl border border-zinc-200 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 transition hover:border-zinc-300 hover:text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:border-zinc-500 dark:hover:text-zinc-50"
                     >
                       配置模型与 MCP
                     </Link>
@@ -150,7 +150,7 @@ export default function Home() {
                   <div className="mt-4 flex flex-col gap-3">
                     <Link
                       href="/conversations"
-                      className="flex items-center justify-between rounded-2xl border border-zinc-200 px-4 py-3 text-sm font-semibold leading-6 text-zinc-700 transition hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-200 dark:hover:border-zinc-600 dark:hover:text-zinc-50"
+                      className="flex items-center justify-between rounded-xl border border-zinc-200 px-4 py-3.5 text-sm font-semibold leading-6 text-zinc-700 transition hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-200 dark:hover:border-zinc-600 dark:hover:text-zinc-50"
                     >
                       会话列表
                       <span className="text-xs text-zinc-400">
@@ -159,7 +159,7 @@ export default function Home() {
                     </Link>
                     <Link
                       href="/settings/general"
-                      className="flex items-center justify-between rounded-2xl border border-zinc-200 px-4 py-3 text-sm font-semibold leading-6 text-zinc-700 transition hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-200 dark:hover:border-zinc-600 dark:hover:text-zinc-50"
+                      className="flex items-center justify-between rounded-xl border border-zinc-200 px-4 py-3.5 text-sm font-semibold leading-6 text-zinc-700 transition hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-200 dark:hover:border-zinc-600 dark:hover:text-zinc-50"
                     >
                       通用设置
                       <span className="text-xs text-zinc-400">
@@ -168,7 +168,7 @@ export default function Home() {
                     </Link>
                     <Link
                       href="/settings/providers"
-                      className="flex items-center justify-between rounded-2xl border border-zinc-200 px-4 py-3 text-sm font-semibold leading-6 text-zinc-700 transition hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-200 dark:hover:border-zinc-600 dark:hover:text-zinc-50"
+                      className="flex items-center justify-between rounded-xl border border-zinc-200 px-4 py-3.5 text-sm font-semibold leading-6 text-zinc-700 transition hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-200 dark:hover:border-zinc-600 dark:hover:text-zinc-50"
                     >
                       模型提供商
                       <span className="text-xs text-zinc-400">
