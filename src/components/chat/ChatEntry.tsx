@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { Tooltip } from "antd";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -184,6 +185,23 @@ export function ChatEntry() {
                         <div className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
                           {assistant.name}
                         </div>
+                        <Tooltip
+                          title={
+                            hasProvider
+                              ? "已绑定模型提供商"
+                              : "未绑定模型提供商，无法发起对话"
+                          }
+                        >
+                          <span
+                            className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium ${
+                              hasProvider
+                                ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200"
+                                : "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200"
+                            }`}
+                          >
+                            {hasProvider ? "模型可用" : "模型未配置"}
+                          </span>
+                        </Tooltip>
                         <Link
                           href={`/settings/assistants/${assistant.id}`}
                           className="text-xs font-semibold text-zinc-500 underline-offset-2 hover:text-zinc-700 hover:underline dark:text-zinc-300 dark:hover:text-zinc-100"
