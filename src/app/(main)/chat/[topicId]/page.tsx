@@ -31,7 +31,10 @@ export default async function ChatPage({ params }: Props) {
   type TopicPreview = Prisma.TopicGetPayload<{
     select: {
       id: true;
-      assistant: { select: { name: true } };
+      title: true;
+      assistant: {
+        select: { name: true; modelId: true; providerConfigId: true };
+      };
     };
   }>;
   let topic: TopicPreview | null = null;
@@ -40,9 +43,12 @@ export default async function ChatPage({ params }: Props) {
       where: { id: topicId },
       select: {
         id: true,
+        title: true,
         assistant: {
           select: {
             name: true,
+            modelId: true,
+            providerConfigId: true,
           },
         },
       },
@@ -62,15 +68,26 @@ export default async function ChatPage({ params }: Props) {
   }
 
   const assistantName = topic.assistant?.name?.trim() || "未命名助手";
+  const topicTitle = topic.title?.trim() || "未命名对话";
   const assistantInitial = assistantName ? assistantName[0] : "?";
+
+  const modelStatus = topic.assistant?.providerConfigId
+    ? {
+        label: `模型：${topic.assistant.modelId}`,
+        tone: "info" as const,
+      }
+    : {
+        label: "模型状态：未配置",
+        tone: "warning" as const,
+      };
 
   return (
     <div className="flex flex-1 flex-col">
       <TopBar
         title={assistantName}
-        subtitle={`会话 · ${topicId}`}
+        subtitle={`${topicTitle} · ${topicId}`}
         leading={assistantInitial}
-        status={{ label: "模型状态：未知", tone: "neutral" }}
+        status={modelStatus}
         actions={<TopBarActions />}
       />
       <main className="flex flex-1 flex-col">
