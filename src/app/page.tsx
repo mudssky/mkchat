@@ -18,8 +18,8 @@ export default function Home() {
           <PageMotion>
             <div className="mx-auto flex w-full max-w-5xl flex-col gap-8">
               <MotionItem className="relative overflow-hidden rounded-[32px] border border-zinc-200 bg-white p-8 shadow-sm transition duration-500 ease-out hover:-translate-y-1 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900">
-                <div className="absolute -right-20 -top-10 h-48 w-48 rounded-full bg-gradient-to-br from-amber-200/70 via-orange-200/60 to-sky-200/60 blur-3xl dark:from-amber-400/20 dark:via-orange-400/20 dark:to-sky-400/20" />
-                <div className="absolute -left-16 bottom-0 h-40 w-40 rounded-full bg-gradient-to-tr from-slate-200/70 to-indigo-200/50 blur-3xl dark:from-slate-500/20 dark:to-indigo-500/20" />
+                <div className="absolute -right-24 -top-12 h-56 w-56 rounded-full bg-gradient-to-br from-amber-200/80 via-orange-200/60 to-sky-200/70 blur-[90px] dark:from-amber-400/25 dark:via-orange-400/20 dark:to-sky-400/25" />
+                <div className="absolute -left-20 bottom-0 h-44 w-44 rounded-full bg-gradient-to-tr from-slate-200/70 to-indigo-200/55 blur-[80px] dark:from-slate-500/25 dark:to-indigo-500/25" />
                 <div className="relative flex flex-col gap-6">
                   <div className="inline-flex w-fit items-center gap-2 rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-semibold text-zinc-600 shadow-sm dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-300">
                     <Sparkles className="h-3.5 w-3.5" />
