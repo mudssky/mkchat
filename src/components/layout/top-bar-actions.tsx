@@ -19,6 +19,12 @@ const actionItems = [
   },
 ];
 
+/**
+ * 顶部栏快捷入口集合。
+ * @param {TopBarActionsProps} props - 组件属性。
+ * @param {string | undefined} props.className - 额外样式类名。
+ * @returns {JSX.Element} 快捷入口组件。
+ */
 export function TopBarActions({ className }: TopBarActionsProps) {
   return (
     <div className={cn("flex items-center gap-2", className)}>

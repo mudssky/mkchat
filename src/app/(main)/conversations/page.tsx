@@ -1,4 +1,5 @@
 import { ChatEntry } from "@/components/chat/ChatEntry";
+import { MotionItem, PageMotion } from "@/components/layout/page-motion";
 import { TopBar } from "@/components/layout/top-bar";
 import { TopBarActions } from "@/components/layout/top-bar-actions";
 
@@ -11,9 +12,11 @@ export default function ConversationsPage() {
         actions={<TopBarActions />}
       />
       <main className="flex-1 px-6 py-6">
-        <div className="mx-auto w-full max-w-5xl">
-          <ChatEntry />
-        </div>
+        <PageMotion>
+          <MotionItem className="mx-auto w-full max-w-5xl">
+            <ChatEntry />
+          </MotionItem>
+        </PageMotion>
       </main>
     </div>
   );

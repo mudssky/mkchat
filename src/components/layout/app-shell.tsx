@@ -28,6 +28,12 @@ interface AppShellProps {
   children: ReactNode;
 }
 
+/**
+ * 应用壳层组件，负责统一侧边导航与移动端顶栏结构。
+ * @param {AppShellProps} props - 组件属性。
+ * @param {ReactNode} props.children - 页面内容。
+ * @returns {JSX.Element} 应用壳层布局。
+ */
 export function AppShell({ children }: AppShellProps) {
   const pathname = usePathname();
 

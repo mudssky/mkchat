@@ -25,6 +25,10 @@ const formatTimestamp = (value: string) => {
   }).format(date);
 };
 
+/**
+ * 会话入口组件，负责展示助手列表与历史会话入口。
+ * @returns {JSX.Element} 会话入口组件。
+ */
 export function ChatEntry() {
   const router = useRouter();
   const [creatingId, setCreatingId] = useState<string | null>(null);

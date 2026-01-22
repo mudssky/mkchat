@@ -30,6 +30,17 @@ const sizeStyles: Record<StatusSize, string> = {
   xs: "px-2 py-0.5 text-[11px]",
 };
 
+/**
+ * 状态徽章组件，支持色调、图标与提示文案。
+ * @param {StatusBadgeProps} props - 组件属性。
+ * @param {string} props.label - 徽章文案。
+ * @param {StatusTone | undefined} props.tone - 徽章色调。
+ * @param {ReactNode | undefined} props.icon - 前置图标。
+ * @param {string | undefined} props.tooltip - 提示文案。
+ * @param {StatusSize | undefined} props.size - 尺寸规格。
+ * @param {string | undefined} props.className - 额外样式类名。
+ * @returns {JSX.Element} 状态徽章。
+ */
 export function StatusBadge({
   label,
   tone = "neutral",

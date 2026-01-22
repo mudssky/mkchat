@@ -4,6 +4,10 @@ import { TopBar } from "@/components/layout/top-bar";
 import { TopBarActions } from "@/components/layout/top-bar-actions";
 import { useSettingsStore } from "@/store/settings-store";
 
+/**
+ * 设置页面顶部栏，展示配置完成度与快捷入口。
+ * @returns {JSX.Element} 设置页顶部栏。
+ */
 export function SettingsTopBar() {
   const providers = useSettingsStore((state) => state.providers);
   const mcpServers = useSettingsStore((state) => state.mcpServers);

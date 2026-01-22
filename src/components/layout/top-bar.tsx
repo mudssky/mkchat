@@ -14,6 +14,16 @@ interface TopBarProps {
   actions?: ReactNode;
 }
 
+/**
+ * 页面顶部栏组件，用于展示标题、副标题、状态与快捷入口。
+ * @param {TopBarProps} props - 组件属性。
+ * @param {string} props.title - 主标题。
+ * @param {string | undefined} props.subtitle - 副标题。
+ * @param {ReactNode | undefined} props.leading - 左侧头像或图标。
+ * @param {TopBarProps["status"] | undefined} props.status - 状态徽章配置。
+ * @param {ReactNode | undefined} props.actions - 右侧操作区。
+ * @returns {JSX.Element} 顶部栏组件。
+ */
 export function TopBar({
   title,
   subtitle,
