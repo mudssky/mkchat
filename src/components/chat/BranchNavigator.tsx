@@ -60,11 +60,12 @@ export function BranchNavigator({
       <button
         type="button"
         className={cn(
-          "inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-medium text-zinc-600 shadow-sm transition hover:border-zinc-300 hover:text-zinc-800",
+          "touch-manipulation inline-flex min-h-8 items-center gap-2 rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-medium text-zinc-600 shadow-sm transition hover:border-zinc-300 hover:text-zinc-800",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40",
           "dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:border-zinc-500 dark:focus-visible:ring-blue-400/40",
         )}
         aria-label={`Branch selector for ${parentMessageId}`}
+        tabIndex={0}
       >
         <GitBranch className="h-3.5 w-3.5" />
         <span className="hidden sm:inline">

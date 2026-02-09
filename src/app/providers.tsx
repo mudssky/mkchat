@@ -1,8 +1,7 @@
 "use client";
 
 import { QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { type ReactNode, useEffect, useState } from "react";
+import { lazy, type ReactNode, Suspense, useEffect, useState } from "react";
 import { createQueryClient } from "@/lib/query-client";
 import { useSettingsStore } from "@/store/settings-store";
 import type { ThemeMode } from "@/types/settings";
@@ -12,6 +11,11 @@ interface ProvidersProps {
 }
 
 type ResolvedTheme = "light" | "dark";
+
+const ReactQueryDevtools = lazy(async () => {
+  const module = await import("@tanstack/react-query-devtools");
+  return { default: module.ReactQueryDevtools };
+});
 
 function resolveTheme(mode: ThemeMode): ResolvedTheme {
   if (mode === "light" || mode === "dark") {
@@ -58,7 +62,9 @@ export function Providers({ children }: ProvidersProps) {
     <QueryClientProvider client={queryClient}>
       {children}
       {process.env.NODE_ENV !== "production" ? (
-        <ReactQueryDevtools initialIsOpen={false} />
+        <Suspense fallback={null}>
+          <ReactQueryDevtools initialIsOpen={false} />
+        </Suspense>
       ) : null}
     </QueryClientProvider>
   );

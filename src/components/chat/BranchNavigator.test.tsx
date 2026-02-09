@@ -94,9 +94,12 @@ describe("BranchNavigator", () => {
 
     expect(screen.getByText("分支 1 / 2")).toBeTruthy();
 
-    fireEvent.click(
-      screen.getByRole("button", { name: "Branch selector for root" }),
-    );
+    const trigger = screen.getByRole("button", {
+      name: "Branch selector for root",
+    });
+    expect(trigger).toHaveAttribute("tabindex", "0");
+
+    fireEvent.click(trigger);
 
     expect(onSelectChild).toHaveBeenCalledWith("a");
   });

@@ -40,6 +40,40 @@ interface UserMessageExtraction {
   uiMessageId: string;
 }
 
+function isE2eChatMockEnabled() {
+  return process.env.MKCHAT_E2E_MOCK_CHAT === "1";
+}
+
+function createMockUIMessageStreamResponse(
+  messageId: string,
+  text: string,
+  metadata: ChatMessageMetadata,
+) {
+  const textPartId = `text-${messageId}`;
+  const chunks = [
+    { type: "start", messageId, messageMetadata: metadata },
+    { type: "start-step" },
+    { type: "text-start", id: textPartId },
+    { type: "text-delta", id: textPartId, delta: text },
+    { type: "text-end", id: textPartId },
+    { type: "finish-step" },
+    { type: "finish", finishReason: "stop", messageMetadata: metadata },
+  ];
+
+  const body = `${chunks
+    .map((chunk) => `data: ${JSON.stringify(chunk)}\n\n`)
+    .join("")}data: [DONE]\n\n`;
+
+  return new Response(body, {
+    headers: {
+      "content-type": "text/event-stream",
+      "cache-control": "no-cache",
+      connection: "keep-alive",
+      "x-vercel-ai-ui-message-stream": "v1",
+    },
+  });
+}
+
 function extractUserMessage(
   messages?: UiMessagePayload[],
 ): UserMessageExtraction | null {
@@ -124,6 +158,28 @@ export async function POST(req: Request) {
       topicId,
       parentId,
     });
+
+    if (isE2eChatMockEnabled()) {
+      const mockText = `Mocked reply: ${extracted.content}`;
+      const assistantMsg = await chatService.createMessage({
+        content: mockText,
+        role: "assistant",
+        topicId,
+        parentId: userMsg.id,
+      });
+
+      const metadata: ChatMessageMetadata = {
+        topicId,
+        parentId: extracted.uiMessageId || userMsg.id,
+        createdAt: new Date().toISOString(),
+      };
+
+      return createMockUIMessageStreamResponse(
+        assistantMsg.id,
+        mockText,
+        metadata,
+      );
+    }
 
     const dbMessages = await chatService.getTrace(userMsg.id);
     const model = getModel(assistant.providerConfig, assistant.modelId);

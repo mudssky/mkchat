@@ -108,8 +108,9 @@ function CodeBlock({ inline, className, children }: CodeBlockProps) {
       <button
         type="button"
         onClick={handleCopy}
-        className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-white/90 px-2 py-1 text-xs font-medium text-zinc-600 shadow-sm transition hover:bg-white dark:border-zinc-700 dark:bg-zinc-900/90 dark:text-zinc-300"
+        className="touch-manipulation absolute right-2 top-2 inline-flex min-h-8 items-center gap-1 rounded-md border border-zinc-200 bg-white/90 px-2 py-1 text-xs font-medium text-zinc-600 shadow-sm transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 dark:border-zinc-700 dark:bg-zinc-900/90 dark:text-zinc-300 dark:focus-visible:ring-blue-400/40"
         aria-label="Copy code"
+        tabIndex={0}
       >
         {copied ? (
           <>

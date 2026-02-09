@@ -132,4 +132,153 @@ describe("POST /api/chat", () => {
     expect(response).toBe(streamResponse);
     expect(streamTextMock).toHaveBeenCalled();
   });
+
+  it("returns 400 on missing user message content", async () => {
+    const request = new Request("http://localhost/api/chat", {
+      method: "POST",
+      body: JSON.stringify({
+        topicId: validTopicId,
+        assistantId: "assistant-1",
+        messages: [],
+      }),
+    });
+
+    const response = await POST(request);
+
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toEqual({
+      error: "Missing message content",
+    });
+  });
+
+  it("returns 404 when assistant provider missing", async () => {
+    prismaMock.assistant.findUnique.mockResolvedValue({
+      ...assistantMock,
+      providerConfig: null,
+    });
+
+    const request = new Request("http://localhost/api/chat", {
+      method: "POST",
+      body: JSON.stringify({
+        topicId: validTopicId,
+        assistantId: "assistant-1",
+        message: "hello",
+      }),
+    });
+
+    const response = await POST(request);
+
+    expect(response.status).toBe(404);
+    await expect(response.text()).resolves.toBe(
+      "Assistant or Provider not found",
+    );
+  });
+
+  it("persists partial response on abort", async () => {
+    prismaMock.assistant.findUnique.mockResolvedValue(assistantMock);
+    chatServiceMock.createMessage
+      .mockResolvedValueOnce({
+        id: "msg-user",
+        topicId: validTopicId,
+        content: "hi",
+        role: "user",
+        parentId: null,
+        createdAt: new Date(),
+      })
+      .mockResolvedValueOnce({
+        id: "msg-assistant",
+        topicId: validTopicId,
+        content: "partial answer",
+        role: "assistant",
+        parentId: "msg-user",
+        createdAt: new Date(),
+      });
+    chatServiceMock.getTrace.mockResolvedValue([
+      {
+        id: "msg-user",
+        topicId: validTopicId,
+        content: "hi",
+        role: "user",
+        parentId: null,
+        createdAt: new Date(),
+      },
+    ]);
+    mcpServiceMock.getToolsForAssistant.mockResolvedValue([]);
+    getModelMock.mockReturnValue({});
+
+    const streamResponse = new Response("stream");
+    streamTextMock.mockImplementation((options: Record<string, unknown>) => {
+      const onChunk = options.onChunk as
+        | ((event: { chunk: { type: string; text: string } }) => void)
+        | undefined;
+      const onAbort = options.onAbort as (() => Promise<void>) | undefined;
+
+      onChunk?.({ chunk: { type: "text-delta", text: "partial answer" } });
+      void onAbort?.();
+
+      return {
+        toUIMessageStreamResponse: vi.fn().mockReturnValue(streamResponse),
+      };
+    });
+
+    const request = new Request("http://localhost/api/chat", {
+      method: "POST",
+      body: JSON.stringify({
+        topicId: validTopicId,
+        assistantId: "assistant-1",
+        message: "hi",
+      }),
+    });
+
+    const response = await POST(request);
+
+    expect(response).toBe(streamResponse);
+    expect(chatServiceMock.createMessage).toHaveBeenNthCalledWith(2, {
+      content: "partial answer",
+      role: "assistant",
+      topicId: validTopicId,
+      parentId: "msg-user",
+      metadata: { incomplete: true, stopped: true },
+    });
+  });
+
+  it("returns mocked stream in e2e mock mode", async () => {
+    vi.stubEnv("MKCHAT_E2E_MOCK_CHAT", "1");
+
+    prismaMock.assistant.findUnique.mockResolvedValue(assistantMock);
+    chatServiceMock.createMessage
+      .mockResolvedValueOnce({
+        id: "msg-user",
+        topicId: validTopicId,
+        content: "hello",
+        role: "user",
+        parentId: null,
+        createdAt: new Date(),
+      })
+      .mockResolvedValueOnce({
+        id: "msg-assistant",
+        topicId: validTopicId,
+        content: "Mocked reply: hello",
+        role: "assistant",
+        parentId: "msg-user",
+        createdAt: new Date(),
+      });
+
+    const request = new Request("http://localhost/api/chat", {
+      method: "POST",
+      body: JSON.stringify({
+        topicId: validTopicId,
+        assistantId: "assistant-1",
+        message: "hello",
+      }),
+    });
+
+    const response = await POST(request);
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("x-vercel-ai-ui-message-stream")).toBe("v1");
+    await expect(response.text()).resolves.toContain("Mocked reply: hello");
+
+    vi.unstubAllEnvs();
+  });
 });

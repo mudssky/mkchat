@@ -3,6 +3,7 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Check, Copy, PencilLine } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { measureChatPerformance } from "@/lib/chat/chat-performance";
 import {
   buildMessageChain,
   getChildrenMap,
@@ -108,13 +109,25 @@ export function MessageList({
         : window.clearTimeout;
 
     const frame = schedule(() => {
-      if (shouldVirtualize) {
-        if (totalItems > 0) {
-          virtualizer.scrollToIndex(totalItems - 1, { align: "end" });
-        }
-      } else {
-        endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-      }
+      measureChatPerformance(
+        "message-list-auto-scroll",
+        () => {
+          if (shouldVirtualize) {
+            if (totalItems > 0) {
+              virtualizer.scrollToIndex(totalItems - 1, { align: "end" });
+            }
+          } else {
+            endRef.current?.scrollIntoView({
+              behavior: "smooth",
+              block: "end",
+            });
+          }
+        },
+        {
+          messageCount: chain.length,
+          virtualized: shouldVirtualize,
+        },
+      );
     });
     return () => cancel(frame);
   }, [chain.length, shouldVirtualize, totalItems, virtualizer]);
@@ -201,8 +214,9 @@ export function MessageList({
                   setEditingId(message.id);
                   setEditingContent(message.content);
                 }}
-                className="inline-flex items-center gap-1 rounded-full border border-zinc-200 bg-white px-2 py-1 text-[11px] font-medium text-zinc-500 transition hover:border-zinc-300 hover:text-zinc-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 disabled:cursor-not-allowed disabled:text-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-200 dark:focus-visible:ring-blue-400/40"
+                className="touch-manipulation inline-flex min-h-8 items-center gap-1 rounded-full border border-zinc-200 bg-white px-2 py-1 text-[11px] font-medium text-zinc-500 transition hover:border-zinc-300 hover:text-zinc-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 disabled:cursor-not-allowed disabled:text-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-200 dark:focus-visible:ring-blue-400/40"
                 aria-label="编辑消息"
+                tabIndex={0}
               >
                 <PencilLine className="h-3.5 w-3.5" />
                 <span className="hidden sm:inline">编辑</span>
@@ -210,8 +224,9 @@ export function MessageList({
               <button
                 type="button"
                 onClick={() => void handleCopy(message)}
-                className="inline-flex items-center gap-1 rounded-full border border-zinc-200 bg-white px-2 py-1 text-[11px] font-medium text-zinc-500 transition hover:border-zinc-300 hover:text-zinc-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-200 dark:focus-visible:ring-blue-400/40"
+                className="touch-manipulation inline-flex min-h-8 items-center gap-1 rounded-full border border-zinc-200 bg-white px-2 py-1 text-[11px] font-medium text-zinc-500 transition hover:border-zinc-300 hover:text-zinc-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-200 dark:focus-visible:ring-blue-400/40"
                 aria-label="复制消息"
+                tabIndex={0}
               >
                 {copiedId === message.id ? (
                   <>
@@ -252,20 +267,22 @@ export function MessageList({
               <div className="mt-2 flex justify-end gap-2">
                 <button
                   type="button"
-                  className="rounded-md border border-zinc-200 px-3 py-1 text-xs font-medium text-zinc-600 hover:border-zinc-300 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-200"
+                  className="touch-manipulation rounded-md border border-zinc-200 px-3 py-1 text-xs font-medium text-zinc-600 hover:border-zinc-300 hover:text-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 dark:border-zinc-700 dark:text-zinc-200 dark:focus-visible:ring-blue-400/40"
                   onClick={() => setEditingId(null)}
+                  tabIndex={0}
                 >
                   取消
                 </button>
                 <button
                   type="button"
-                  className="rounded-md bg-zinc-900 px-3 py-1 text-xs font-semibold text-white disabled:cursor-not-allowed disabled:bg-zinc-300 dark:bg-zinc-100 dark:text-zinc-900 dark:disabled:bg-zinc-700"
+                  className="touch-manipulation rounded-md bg-zinc-900 px-3 py-1 text-xs font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 disabled:cursor-not-allowed disabled:bg-zinc-300 dark:bg-zinc-100 dark:text-zinc-900 dark:focus-visible:ring-blue-400/40 dark:disabled:bg-zinc-700"
                   disabled={!editingContent.trim()}
                   onClick={() => {
                     if (!editingContent.trim()) return;
                     onEditMessage?.(message, editingContent.trim());
                     setEditingId(null);
                   }}
+                  tabIndex={0}
                 >
                   提交
                 </button>

@@ -95,8 +95,8 @@ const createFixture = () => {
 
 const cleanupFixture = (fixture) => {
   if (!fixture) return;
-  const deleteMessages = db.prepare(
-    'DELETE FROM "Message" WHERE "id" IN (?, ?, ?)',
+  const deleteTopicMessages = db.prepare(
+    'DELETE FROM "Message" WHERE "topicId" = ?',
   );
   const deleteTopic = db.prepare('DELETE FROM "Topic" WHERE "id" = ?');
   const deleteAssistant = db.prepare('DELETE FROM "Assistant" WHERE "id" = ?');
@@ -106,7 +106,7 @@ const cleanupFixture = (fixture) => {
   const deleteUser = db.prepare('DELETE FROM "User" WHERE "id" = ?');
 
   const transaction = db.transaction(() => {
-    deleteMessages.run(...fixture.messageIds);
+    deleteTopicMessages.run(fixture.topicId);
     deleteTopic.run(fixture.topicId);
     deleteAssistant.run(fixture.assistantId);
     deleteProvider.run(fixture.providerConfigId);

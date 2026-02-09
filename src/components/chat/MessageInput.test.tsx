@@ -70,6 +70,7 @@ describe("MessageInput", () => {
 
     expect(onSend).not.toHaveBeenCalled();
     expect(screen.getByText("消息不能为空")).toBeTruthy();
+    expect(screen.getByRole("alert")).toHaveTextContent("消息不能为空");
   });
 
   it("sends on submit button", async () => {

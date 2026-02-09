@@ -80,7 +80,9 @@ export function MessageInput({
       }}
       footer={
         errorMessage ? (
-          <span className="text-xs text-red-500">{errorMessage}</span>
+          <span className="text-xs text-red-500" role="alert">
+            {errorMessage}
+          </span>
         ) : isEmpty ? (
           <span className="text-xs text-zinc-400">请输入内容后发送</span>
         ) : null

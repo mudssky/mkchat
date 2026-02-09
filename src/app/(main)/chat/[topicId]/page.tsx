@@ -8,6 +8,11 @@ import { TopBar } from "@/components/layout/top-bar";
 import { TopBarActions } from "@/components/layout/top-bar-actions";
 import { isValidTopicId } from "@/lib/chat/topic-id";
 import { logPrismaError, prisma, prismaDebugEnabled } from "@/lib/prisma";
+import type {
+  ChatMessageRecordMetadata,
+  ChatRole,
+  ChatTopic,
+} from "@/types/chat";
 
 interface Props {
   params: Promise<{
@@ -23,6 +28,51 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+type TopicDetail = Prisma.TopicGetPayload<{
+  select: {
+    id: true;
+    assistantId: true;
+    title: true;
+    createdAt: true;
+    updatedAt: true;
+    assistant: {
+      select: { name: true; modelId: true; providerConfigId: true };
+    };
+    messages: {
+      select: {
+        id: true;
+        topicId: true;
+        content: true;
+        role: true;
+        createdAt: true;
+        parentId: true;
+        metadata: true;
+      };
+    };
+  };
+}>;
+
+function toChatTopic(topic: TopicDetail): ChatTopic {
+  return {
+    id: topic.id,
+    assistantId: topic.assistantId,
+    title: topic.title,
+    createdAt: topic.createdAt.toISOString(),
+    updatedAt: topic.updatedAt.toISOString(),
+    messages: topic.messages.map((message) => ({
+      id: message.id,
+      topicId: message.topicId,
+      content: message.content,
+      role: message.role as ChatRole,
+      createdAt: message.createdAt.toISOString(),
+      parentId: message.parentId,
+      metadata:
+        (message.metadata as ChatMessageRecordMetadata | null | undefined) ??
+        null,
+    })),
+  };
+}
+
 export default async function ChatPage({ params }: Props) {
   const { topicId } = await params;
 
@@ -30,27 +80,35 @@ export default async function ChatPage({ params }: Props) {
     notFound();
   }
 
-  type TopicPreview = Prisma.TopicGetPayload<{
-    select: {
-      id: true;
-      title: true;
-      assistant: {
-        select: { name: true; modelId: true; providerConfigId: true };
-      };
-    };
-  }>;
-  let topic: TopicPreview | null = null;
+  let topic: TopicDetail | null = null;
   try {
     topic = await prisma.topic.findUnique({
       where: { id: topicId },
       select: {
         id: true,
+        assistantId: true,
         title: true,
+        createdAt: true,
+        updatedAt: true,
         assistant: {
           select: {
             name: true,
             modelId: true,
             providerConfigId: true,
+          },
+        },
+        messages: {
+          orderBy: {
+            createdAt: "asc",
+          },
+          select: {
+            id: true,
+            topicId: true,
+            content: true,
+            role: true,
+            createdAt: true,
+            parentId: true,
+            metadata: true,
           },
         },
       },
@@ -72,6 +130,7 @@ export default async function ChatPage({ params }: Props) {
   const assistantName = topic.assistant?.name?.trim() || "未命名助手";
   const topicTitle = topic.title?.trim() || "未命名对话";
   const assistantInitial = assistantName ? assistantName[0] : "?";
+  const initialTopic = toChatTopic(topic);
 
   const modelStatus = !topic.assistant
     ? {
@@ -105,7 +164,11 @@ export default async function ChatPage({ params }: Props) {
       />
       <PageFrame widthPreset="chat" density="compact" className="flex">
         <div className="flex flex-1 flex-col">
-          <ChatContainer topicId={topicId} assistantName={assistantName} />
+          <ChatContainer
+            topicId={topicId}
+            assistantName={assistantName}
+            initialTopic={initialTopic}
+          />
         </div>
       </PageFrame>
     </div>

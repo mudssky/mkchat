@@ -5,6 +5,11 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { DefaultChatTransport, type UIMessage } from "ai";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
+import {
+  CHAT_PERFORMANCE_EVENT,
+  type ChatPerformanceMetric,
+  measureChatPerformance,
+} from "@/lib/chat/chat-performance";
 import { buildMessageChain, getDefaultLeaf } from "@/lib/chat/message-tree";
 import type { TopicResponse } from "@/lib/chat/topic-schema";
 import { topicResponseSchema } from "@/lib/chat/topic-schema";
@@ -16,6 +21,7 @@ import { MessageList } from "./MessageList";
 interface ChatContainerProps {
   topicId: string;
   assistantName?: string;
+  initialTopic?: TopicResponse["topic"];
 }
 
 const metadataSchema: z.ZodType<ChatMessageMetadata> = z.object({
@@ -66,17 +72,39 @@ function arePathsEqual(a: string[], b: string[]) {
   return a.every((value, index) => value === b[index]);
 }
 
-export function ChatContainer({ topicId, assistantName }: ChatContainerProps) {
+interface ChatRequestMetadata {
+  topicId: string;
+  assistantId: string;
+  parentId: string | null;
+}
+
+function buildPathFromLeaf(messages: ChatMessage[], leafId: string) {
+  return measureChatPerformance(
+    "message-chain-build",
+    () => buildMessageChain(messages, leafId).map((message) => message.id),
+    { messageCount: messages.length },
+  );
+}
+
+export function ChatContainer({
+  topicId,
+  assistantName,
+  initialTopic,
+}: ChatContainerProps) {
   const queryClient = useQueryClient();
   const [timeoutError, setTimeoutError] = useState<string | null>(null);
   const [connectionError, setConnectionError] = useState<string | null>(null);
   const [stoppedMessageId, setStoppedMessageId] = useState<string | null>(null);
+  const [performanceMetrics, setPerformanceMetrics] = useState<
+    ChatPerformanceMetric[]
+  >([]);
   const lastSentContentRef = useRef<string | null>(null);
+  const lastSyncedDataAtRef = useRef(0);
   const pendingUserMessageIdRef = useRef<string | null>(null);
   const lastAssistantContentRef = useRef<string>("");
   const lastActivityAtRef = useRef<number | null>(null);
 
-  const { data, isLoading, isError, error, refetch } = useQuery<
+  const { data, dataUpdatedAt, isLoading, isError, error, refetch } = useQuery<
     TopicResponse,
     Error
   >({
@@ -89,10 +117,44 @@ export function ChatContainer({ topicId, assistantName }: ChatContainerProps) {
       const payload = await response.json();
       return topicResponseSchema.parse(payload);
     },
+    initialData: initialTopic ? { topic: initialTopic } : undefined,
+    initialDataUpdatedAt: initialTopic ? Date.now() : undefined,
+    staleTime: initialTopic ? 30_000 : 0,
   });
 
   const transport = useMemo(
-    () => new DefaultChatTransport({ api: "/api/chat" }),
+    () =>
+      new DefaultChatTransport({
+        api: "/api/chat",
+        prepareSendMessagesRequest: (options) => {
+          const requestMetadata =
+            (options.requestMetadata as ChatRequestMetadata | undefined) ??
+            undefined;
+
+          const baseBody = {
+            ...(options.body ?? {}),
+            id: options.id,
+            messages: options.messages,
+            trigger: options.trigger,
+            messageId: options.messageId,
+          };
+
+          if (!requestMetadata) {
+            return {
+              body: baseBody,
+            };
+          }
+
+          return {
+            body: {
+              ...baseBody,
+              topicId: requestMetadata.topicId,
+              assistantId: requestMetadata.assistantId,
+              parentId: requestMetadata.parentId,
+            },
+          };
+        },
+      }),
     [],
   );
 
@@ -156,16 +218,25 @@ export function ChatContainer({ topicId, assistantName }: ChatContainerProps) {
     }));
   }, [data?.topic.messages]);
 
+  // 仅在 Query 数据版本更新后回写，避免流式完成瞬间被旧缓存覆盖。
   useEffect(() => {
     if (status === "streaming" || status === "submitted") return;
-    setMessages(baseMessages);
-  }, [baseMessages, setMessages, status]);
+    if (!data || dataUpdatedAt <= lastSyncedDataAtRef.current) return;
 
-  const displayMessages = useMemo(() => {
-    return uiMessages.map((message) =>
-      uiMessageToChatMessage(message, topicId),
-    );
-  }, [uiMessages, topicId]);
+    setMessages(baseMessages);
+    lastSyncedDataAtRef.current = dataUpdatedAt;
+  }, [baseMessages, data, dataUpdatedAt, setMessages, status]);
+
+  const displayMessages = useMemo(
+    () =>
+      measureChatPerformance(
+        "ui-message-normalize",
+        () =>
+          uiMessages.map((message) => uiMessageToChatMessage(message, topicId)),
+        { messageCount: uiMessages.length },
+      ),
+    [topicId, uiMessages],
+  );
 
   useEffect(() => {
     if (displayMessages.length === 0) {
@@ -183,9 +254,7 @@ export function ChatContainer({ topicId, assistantName }: ChatContainerProps) {
     if (!leafExists) {
       const defaultLeaf = getDefaultLeaf(displayMessages);
       const nextPath = defaultLeaf
-        ? buildMessageChain(displayMessages, defaultLeaf.id).map(
-            (msg) => msg.id,
-          )
+        ? buildPathFromLeaf(displayMessages, defaultLeaf.id)
         : [];
       if (!arePathsEqual(currentBranchPath, nextPath)) {
         setCurrentBranch(nextPath);
@@ -197,13 +266,28 @@ export function ChatContainer({ topicId, assistantName }: ChatContainerProps) {
     if (status !== "submitted" && status !== "streaming") return;
     const lastMessage = displayMessages[displayMessages.length - 1];
     if (!lastMessage) return;
-    const nextPath = buildMessageChain(displayMessages, lastMessage.id).map(
-      (message) => message.id,
-    );
+    const nextPath = buildPathFromLeaf(displayMessages, lastMessage.id);
     if (!arePathsEqual(currentBranchPath, nextPath)) {
       setCurrentBranch(nextPath);
     }
   }, [currentBranchPath, displayMessages, setCurrentBranch, status]);
+
+  useEffect(() => {
+    if (process.env.NODE_ENV !== "development") return undefined;
+
+    const handleMetric = (event: Event) => {
+      const customEvent = event as CustomEvent<ChatPerformanceMetric>;
+      if (!customEvent.detail) return;
+      setPerformanceMetrics((previous) =>
+        [customEvent.detail, ...previous].slice(0, 5),
+      );
+    };
+
+    window.addEventListener(CHAT_PERFORMANCE_EVENT, handleMetric);
+    return () => {
+      window.removeEventListener(CHAT_PERFORMANCE_EVENT, handleMetric);
+    };
+  }, []);
 
   useEffect(() => {
     if (status === "submitted") {
@@ -313,11 +397,11 @@ export function ChatContainer({ topicId, assistantName }: ChatContainerProps) {
       await sendMessage(
         { text: content, metadata },
         {
-          body: {
+          metadata: {
             topicId: data.topic.id,
             assistantId: data.topic.assistantId,
             parentId: currentLeafId,
-          },
+          } satisfies ChatRequestMetadata,
         },
       );
     },
@@ -340,11 +424,11 @@ export function ChatContainer({ topicId, assistantName }: ChatContainerProps) {
       await sendMessage(
         { text: content, metadata },
         {
-          body: {
+          metadata: {
             topicId: data.topic.id,
             assistantId: data.topic.assistantId,
             parentId: message.parentId,
-          },
+          } satisfies ChatRequestMetadata,
         },
       );
     },
@@ -418,7 +502,9 @@ export function ChatContainer({ topicId, assistantName }: ChatContainerProps) {
                   <button
                     type="button"
                     onClick={() => regenerate()}
-                    className="text-xs font-semibold text-red-700 underline-offset-2 hover:underline dark:text-red-200"
+                    className="touch-manipulation rounded-md px-2 py-1 text-xs font-semibold text-red-700 underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40 dark:text-red-200 dark:focus-visible:ring-red-400/40"
+                    tabIndex={0}
+                    aria-label="重试生成"
                   >
                     重试生成
                   </button>
@@ -443,7 +529,9 @@ export function ChatContainer({ topicId, assistantName }: ChatContainerProps) {
                   <button
                     type="button"
                     onClick={() => handleStop()}
-                    className="text-xs font-semibold text-zinc-500 hover:text-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 dark:text-zinc-400 dark:hover:text-zinc-100 dark:focus-visible:ring-blue-400/40"
+                    className="touch-manipulation rounded-md px-2 py-1 text-xs font-semibold text-zinc-500 hover:text-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 dark:text-zinc-400 dark:hover:text-zinc-100 dark:focus-visible:ring-blue-400/40"
+                    tabIndex={0}
+                    aria-label="停止生成"
                   >
                     停止生成
                   </button>
@@ -454,6 +542,31 @@ export function ChatContainer({ topicId, assistantName }: ChatContainerProps) {
                   </div>
                 ) : null}
               </div>
+
+              {process.env.NODE_ENV === "development" &&
+              performanceMetrics.length > 0 ? (
+                <div
+                  className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-[11px] text-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400"
+                  aria-live="polite"
+                >
+                  <div className="mb-1 font-semibold text-zinc-600 dark:text-zinc-300">
+                    性能监控（最近 5 条）
+                  </div>
+                  <ul className="space-y-1">
+                    {performanceMetrics.map((metric, index) => (
+                      <li key={`${metric.name}-${index}`}>
+                        {metric.name}: {metric.durationMs.toFixed(2)}ms
+                        {typeof metric.messageCount === "number"
+                          ? ` · messages=${metric.messageCount}`
+                          : ""}
+                        {typeof metric.virtualized === "boolean"
+                          ? ` · virtualized=${metric.virtualized ? "yes" : "no"}`
+                          : ""}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
             </div>
           </div>
         </div>

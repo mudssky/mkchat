@@ -131,6 +131,8 @@ describe("MessageBubble 组件", () => {
     );
 
     const copyButton = screen.getByRole("button", { name: "Copy code" });
+    expect(copyButton).toHaveAttribute("tabindex", "0");
+
     await act(async () => {
       fireEvent.click(copyButton);
     });

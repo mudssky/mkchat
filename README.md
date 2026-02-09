@@ -9,6 +9,15 @@ The app now follows a template-first UI contract to keep route-level layout and 
 - Content container: `PageFrame` controls width presets (`home`, `list`, `chat`, `settings`) and density (`comfortable`, `compact`).
 - Module navigation: `ModuleSubNav` is used for module-scoped secondary nav (settings by default).
 
+## Chat UI
+
+- Chat route: `/chat/[topicId]`
+- Core components: `src/components/chat/`
+- Streaming API: `POST /api/chat`
+- Topic API: `GET /api/topics/[id]`
+
+更多组件与交互说明见 `docs/chat-components.md`。
+
 ### Theme Resolution (System-First)
 
 Theme state is resolved with system-first semantics:
@@ -33,6 +42,8 @@ bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+项目默认开发端口为 `32303`，可直接访问 `http://127.0.0.1:32303`。
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
