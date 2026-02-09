@@ -365,7 +365,7 @@ export function ChatContainer({ topicId, assistantName }: ChatContainerProps) {
   const showThinkingIndicator = status === "submitted";
 
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="flex flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
       {isLoading ? (
         <div className="flex flex-1 items-center justify-center text-sm text-zinc-500">
           正在加载对话...
@@ -388,8 +388,8 @@ export function ChatContainer({ topicId, assistantName }: ChatContainerProps) {
       ) : null}
 
       {!isLoading && !isError ? (
-        <div className="flex flex-1 flex-col">
-          <div className="flex-1">
+        <div className="flex flex-1 flex-col bg-zinc-50/40 dark:bg-zinc-950/30">
+          <div className="flex-1 px-1 sm:px-2">
             <MessageList
               messages={displayMessages}
               currentLeafId={currentLeafId}
@@ -403,15 +403,22 @@ export function ChatContainer({ topicId, assistantName }: ChatContainerProps) {
             />
           </div>
 
-          <div className="border-t border-zinc-200 bg-white px-4 py-4 dark:border-zinc-800 dark:bg-zinc-900 sm:px-6">
+          <div className="sticky bottom-0 border-t border-zinc-200 bg-white/95 px-3 py-3 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/90 sm:px-4">
             <div className="flex w-full flex-col gap-3">
+              <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-zinc-400">
+                <span>
+                  {isBusy ? "模型正在生成，请稍候…" : "已就绪，可继续提问"}
+                </span>
+                <span>Ctrl / Cmd + Enter 发送</span>
+              </div>
+
               {connectionError || chatError ? (
-                <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-600 dark:border-red-800 dark:bg-red-950/40 dark:text-red-200">
-                  {connectionError ?? chatError?.message}
+                <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-600 dark:border-red-800 dark:bg-red-950/40 dark:text-red-200">
+                  <span>{connectionError ?? chatError?.message}</span>
                   <button
                     type="button"
                     onClick={() => regenerate()}
-                    className="ml-3 text-xs font-semibold text-red-700 underline-offset-2 hover:underline dark:text-red-200"
+                    className="text-xs font-semibold text-red-700 underline-offset-2 hover:underline dark:text-red-200"
                   >
                     重试生成
                   </button>
@@ -431,20 +438,22 @@ export function ChatContainer({ topicId, assistantName }: ChatContainerProps) {
                 disabled={isBusy}
               />
 
-              {isBusy ? (
-                <button
-                  type="button"
-                  onClick={() => handleStop()}
-                  className="self-start text-xs font-semibold text-zinc-500 hover:text-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 dark:text-zinc-400 dark:hover:text-zinc-100 dark:focus-visible:ring-blue-400/40"
-                >
-                  停止生成
-                </button>
-              ) : null}
-              {isBusy ? (
-                <div className="text-[11px] text-zinc-400">
-                  请等待当前响应完成
-                </div>
-              ) : null}
+              <div className="flex min-h-5 items-center gap-3">
+                {isBusy ? (
+                  <button
+                    type="button"
+                    onClick={() => handleStop()}
+                    className="text-xs font-semibold text-zinc-500 hover:text-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 dark:text-zinc-400 dark:hover:text-zinc-100 dark:focus-visible:ring-blue-400/40"
+                  >
+                    停止生成
+                  </button>
+                ) : null}
+                {isBusy ? (
+                  <div className="text-[11px] text-zinc-400">
+                    请等待当前响应完成
+                  </div>
+                ) : null}
+              </div>
             </div>
           </div>
         </div>

@@ -112,7 +112,9 @@ export default function AssistantSettingsPage() {
   if (!assistantId) {
     return (
       <SettingsSection title="助手配置" description="缺少助手 ID">
-        <div className="text-sm text-zinc-500">未找到助手 ID。</div>
+        <div className="rounded-xl border border-dashed border-zinc-200 bg-zinc-50 px-4 py-4 text-sm text-zinc-500 dark:border-zinc-800 dark:bg-zinc-950/40">
+          未找到助手 ID。
+        </div>
       </SettingsSection>
     );
   }
@@ -120,7 +122,9 @@ export default function AssistantSettingsPage() {
   if (isLoading) {
     return (
       <SettingsSection title="助手配置" description="加载中">
-        <div className="text-sm text-zinc-500">正在加载助手信息...</div>
+        <div className="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-4 text-sm text-zinc-500 dark:border-zinc-800 dark:bg-zinc-950/40">
+          正在加载助手信息...
+        </div>
       </SettingsSection>
     );
   }
@@ -128,14 +132,18 @@ export default function AssistantSettingsPage() {
   if (isError) {
     return (
       <SettingsSection title="助手配置" description="加载失败">
-        <div className="text-sm text-zinc-600">加载失败：{error?.message}</div>
-        <button
-          type="button"
-          onClick={() => router.push("/")}
-          className="mt-3 rounded-lg border border-zinc-200 px-3 py-1 text-xs font-medium text-zinc-600 hover:border-zinc-300 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-200"
-        >
-          返回首页
-        </button>
+        <div className="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-4 dark:border-zinc-800 dark:bg-zinc-950/40">
+          <div className="text-sm text-zinc-600 dark:text-zinc-300">
+            加载失败：{error?.message}
+          </div>
+          <button
+            type="button"
+            onClick={() => router.push("/")}
+            className="mt-3 rounded-lg border border-zinc-200 px-3 py-1 text-xs font-medium text-zinc-600 hover:border-zinc-300 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-200"
+          >
+            返回首页
+          </button>
+        </div>
       </SettingsSection>
     );
   }
@@ -149,39 +157,44 @@ export default function AssistantSettingsPage() {
       title="助手配置"
       description="编辑助手的名称、模型与系统提示"
     >
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <label
-            htmlFor="assistant-name"
-            className="text-sm font-medium text-zinc-900 dark:text-zinc-50"
-          >
-            名称
-          </label>
-          <input
-            id="assistant-name"
-            value={formState.name}
-            onChange={(event) =>
-              setFormState((prev) => ({ ...prev, name: event.target.value }))
-            }
-            className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
-          />
-        </div>
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="grid gap-5 lg:grid-cols-2">
+          <div className="space-y-2">
+            <label
+              htmlFor="assistant-name"
+              className="text-sm font-medium text-zinc-900 dark:text-zinc-50"
+            >
+              名称
+            </label>
+            <input
+              id="assistant-name"
+              value={formState.name}
+              onChange={(event) =>
+                setFormState((prev) => ({ ...prev, name: event.target.value }))
+              }
+              className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            />
+          </div>
 
-        <div className="space-y-2">
-          <label
-            htmlFor="assistant-model"
-            className="text-sm font-medium text-zinc-900 dark:text-zinc-50"
-          >
-            模型
-          </label>
-          <input
-            id="assistant-model"
-            value={formState.modelId}
-            onChange={(event) =>
-              setFormState((prev) => ({ ...prev, modelId: event.target.value }))
-            }
-            className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
-          />
+          <div className="space-y-2">
+            <label
+              htmlFor="assistant-model"
+              className="text-sm font-medium text-zinc-900 dark:text-zinc-50"
+            >
+              模型
+            </label>
+            <input
+              id="assistant-model"
+              value={formState.modelId}
+              onChange={(event) =>
+                setFormState((prev) => ({
+                  ...prev,
+                  modelId: event.target.value,
+                }))
+              }
+              className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            />
+          </div>
         </div>
 
         <div className="space-y-2">
