@@ -52,3 +52,5 @@ prisma/generated
 *.db
 
 .pnpm-store
+
+*.pyc
