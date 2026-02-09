@@ -1,5 +1,6 @@
 const Database = require("better-sqlite3");
 const crypto = require("node:crypto");
+const fs = require("node:fs");
 const path = require("node:path");
 
 const databaseUrl = process.env.DATABASE_URL ?? "file:./prisma/dev.db";
@@ -13,6 +14,10 @@ const db = new Database(resolvedPath);
 db.pragma("foreign_keys = ON");
 
 const createId = () => `c${crypto.randomBytes(12).toString("hex")}`;
+
+const writeStdout = (content) => {
+  fs.writeSync(1, `${content}\n`);
+};
 
 const createFixture = () => {
   const now = new Date().toISOString();
@@ -115,26 +120,28 @@ const cleanupFixture = (fixture) => {
   transaction();
 };
 
-const run = async () => {
+const run = () => {
   const mode = process.argv[2];
-  try {
-    if (mode === "create") {
-      const fixture = await createFixture();
-      process.stdout.write(JSON.stringify(fixture));
-      return;
-    }
-    if (mode === "cleanup") {
-      const fixture = JSON.parse(process.env.CHAT_FIXTURE || "null");
-      await cleanupFixture(fixture);
-      return;
-    }
-    throw new Error("Unknown mode");
-  } finally {
-    db.close();
+  if (mode === "create") {
+    const fixture = createFixture();
+    writeStdout(JSON.stringify(fixture));
+    return;
   }
+
+  if (mode === "cleanup") {
+    const fixture = JSON.parse(process.env.CHAT_FIXTURE || "null");
+    cleanupFixture(fixture);
+    return;
+  }
+
+  throw new Error("Unknown mode");
 };
 
-run().catch((error) => {
+try {
+  run();
+} catch (error) {
   console.error(error);
-  process.exit(1);
-});
+  process.exitCode = 1;
+} finally {
+  db.close();
+}

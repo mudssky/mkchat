@@ -43,3 +43,12 @@ export default function ChatSection() {
 - 关键操作按钮提供 `aria-label`。
 - 焦点态统一使用 `focus-visible` ring。
 - 触摸交互按钮使用 `touch-manipulation` 和最小点击尺寸。
+
+## Storybook 示例（可选）
+
+- 已新增示例文件：`src/components/chat/MessageInput.stories.tsx`
+- 包含场景：
+  - `Default`（默认输入状态）
+  - `WithDraft`（带草稿内容）
+  - `Disabled`（禁用/发送中态）
+- 该文件采用 CSF 风格，可在后续引入 Storybook 工具链后直接使用。

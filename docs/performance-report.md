@@ -36,9 +36,31 @@
 
 ## Lighthouse
 
-- 执行建议：
-  1. 启动应用 `pnpm dev`
-  2. 打开 `http://127.0.0.1:32303/chat/<topicId>`
-  3. 使用 Chrome DevTools Lighthouse（Performance）运行审计
+### 执行环境
 
-> 当前仓库未内置 CI Lighthouse 脚本，报告由本地审计流程生成。
+- 日期：2026-02-09
+- 页面：`/chat/<fixture-topic-id>`
+- 浏览器：`/usr/bin/google-chrome`
+- 命令：`pnpm dlx lighthouse`
+
+### 审计结果（新增）
+
+1. **Mobile 默认预设（Production）**
+   - Performance: **32**
+   - Accessibility: **96**
+   - Best Practices: **100**
+   - SEO: **100**
+   - 报告文件：
+     - `docs/lighthouse/chat-prod-20260209-141034.report.html`
+     - `docs/lighthouse/chat-prod-20260209-141034.report.json`
+
+2. **Desktop 预设（Production）**
+   - Performance: **68**
+   - Accessibility: **96**
+   - Best Practices: **100**
+   - SEO: **100**
+   - 报告文件：
+     - `docs/lighthouse/chat-prod-desktop-20260209-141130.report.html`
+     - `docs/lighthouse/chat-prod-desktop-20260209-141130.report.json`
+
+> 结论：当前 Lighthouse Performance 仍未达到目标阈值（>90），后续需要继续针对首屏脚本体积、LCP 与主线程阻塞时间做优化。

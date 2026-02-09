@@ -28,14 +28,27 @@ async function runFixtureScript(
     DATABASE_URL: databaseUrl,
     CHAT_FIXTURE: fixture ? JSON.stringify(fixture) : undefined,
   };
-  const { stdout } = await execFileAsync(
+  const { stdout, stderr } = await execFileAsync(
     "node",
     ["tests/fixtures/chat-fixture.cjs", mode],
     { env },
   );
 
   if (mode === "create") {
-    return JSON.parse(stdout) as ChatFixture;
+    const output = stdout.trim();
+    if (!output) {
+      throw new Error(
+        `Fixture script returned empty output. stderr: ${stderr}`,
+      );
+    }
+
+    try {
+      return JSON.parse(output) as ChatFixture;
+    } catch (error) {
+      throw new Error(`Failed to parse fixture JSON: ${output}`, {
+        cause: error,
+      });
+    }
   }
   return undefined;
 }
