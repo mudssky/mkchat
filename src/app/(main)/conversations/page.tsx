@@ -1,4 +1,5 @@
 import { ChatEntry } from "@/components/chat/ChatEntry";
+import { PageFrame } from "@/components/layout/page-frame";
 import { MotionItem, PageMotion } from "@/components/layout/page-motion";
 import { TopBar } from "@/components/layout/top-bar";
 import { TopBarActions } from "@/components/layout/top-bar-actions";
@@ -11,13 +12,13 @@ export default function ConversationsPage() {
         subtitle="选择助手或继续历史会话"
         actions={<TopBarActions />}
       />
-      <main className="flex-1 px-6 py-6">
+      <PageFrame widthPreset="list" density="compact">
         <PageMotion>
-          <MotionItem className="mx-auto w-full max-w-5xl">
+          <MotionItem>
             <ChatEntry />
           </MotionItem>
         </PageMotion>
-      </main>
+      </PageFrame>
     </div>
   );
 }

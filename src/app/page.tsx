@@ -1,6 +1,7 @@
 import { Sparkles, Workflow, Wrench } from "lucide-react";
 import Link from "next/link";
 import { AppShell } from "@/components/layout/app-shell";
+import { PageFrame } from "@/components/layout/page-frame";
 import { MotionItem, PageMotion } from "@/components/layout/page-motion";
 import { TopBar } from "@/components/layout/top-bar";
 import { TopBarActions } from "@/components/layout/top-bar-actions";
@@ -14,9 +15,9 @@ export default function Home() {
           subtitle="为每一次对话建立清晰的结构与节奏"
           actions={<TopBarActions />}
         />
-        <main className="flex-1 px-6 py-8">
+        <PageFrame widthPreset="home" density="comfortable">
           <PageMotion>
-            <div className="mx-auto flex w-full max-w-5xl flex-col gap-8">
+            <div className="flex w-full flex-col gap-8">
               <MotionItem className="relative overflow-hidden rounded-[32px] border border-zinc-200 bg-white p-8 shadow-sm transition duration-500 ease-out hover:-translate-y-1 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900">
                 <div className="absolute -right-24 -top-12 h-56 w-56 rounded-full bg-gradient-to-br from-amber-200/80 via-orange-200/60 to-sky-200/70 blur-[90px] dark:from-amber-400/25 dark:via-orange-400/20 dark:to-sky-400/25" />
                 <div className="absolute -left-20 bottom-0 h-44 w-44 rounded-full bg-gradient-to-tr from-slate-200/70 to-indigo-200/55 blur-[80px] dark:from-slate-500/25 dark:to-indigo-500/25" />
@@ -180,7 +181,7 @@ export default function Home() {
               </MotionItem>
             </div>
           </PageMotion>
-        </main>
+        </PageFrame>
       </div>
     </AppShell>
   );

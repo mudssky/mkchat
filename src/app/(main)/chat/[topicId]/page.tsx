@@ -3,6 +3,7 @@ import { AlertTriangle, CheckCircle2 } from "lucide-react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ChatContainer } from "@/components/chat/ChatContainer";
+import { PageFrame } from "@/components/layout/page-frame";
 import { TopBar } from "@/components/layout/top-bar";
 import { TopBarActions } from "@/components/layout/top-bar-actions";
 import { isValidTopicId } from "@/lib/chat/topic-id";
@@ -102,11 +103,11 @@ export default async function ChatPage({ params }: Props) {
         status={modelStatus}
         actions={<TopBarActions />}
       />
-      <main className="flex flex-1 flex-col">
-        <div className="mx-auto flex w-full max-w-[800px] flex-1 flex-col px-4 py-6 sm:px-6">
+      <PageFrame widthPreset="chat" density="compact" className="flex">
+        <div className="flex flex-1 flex-col">
           <ChatContainer topicId={topicId} assistantName={assistantName} />
         </div>
-      </main>
+      </PageFrame>
     </div>
   );
 }

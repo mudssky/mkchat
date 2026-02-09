@@ -172,8 +172,8 @@ describe("SettingsSidebar 组件", () => {
       const { container } = render(<SettingsSidebar />);
 
       const aside = container.querySelector("aside");
-      expect(aside).toHaveClass("w-64");
-      expect(aside).toHaveClass("border-r");
+      expect(aside).toHaveClass("rounded-2xl");
+      expect(aside).toHaveClass("border");
       expect(aside).toHaveClass("border-zinc-200");
     });
   });
@@ -186,7 +186,7 @@ describe("SettingsSidebar 组件", () => {
 
       const aside = container.querySelector("aside");
       expect(aside).toHaveClass("dark:border-zinc-800");
-      expect(aside).toHaveClass("dark:bg-zinc-950");
+      expect(aside).toHaveClass("dark:bg-zinc-900");
     });
 
     it("应该在激活状态应用深色模式样式", () => {

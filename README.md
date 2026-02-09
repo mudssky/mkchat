@@ -1,5 +1,23 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## UI System Conventions
+
+The app now follows a template-first UI contract to keep route-level layout and navigation behavior consistent.
+
+- Global shell: `AppShell` provides first-level navigation (`/`, `/conversations`, `/settings/*`).
+- Page context: `TopBar` is used across core pages for title/subtitle/status/actions.
+- Content container: `PageFrame` controls width presets (`home`, `list`, `chat`, `settings`) and density (`comfortable`, `compact`).
+- Module navigation: `ModuleSubNav` is used for module-scoped secondary nav (settings by default).
+
+### Theme Resolution (System-First)
+
+Theme state is resolved with system-first semantics:
+
+- `theme = "system"` → follow OS theme
+- `theme = "light" | "dark"` → explicit override
+
+Resolved theme is applied on `document.documentElement[data-theme]` and consumed by global CSS variables in `src/app/globals.css`.
+
 ## Getting Started
 
 First, run the development server:
