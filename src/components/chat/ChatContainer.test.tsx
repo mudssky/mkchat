@@ -122,6 +122,13 @@ describe("ChatContainer", () => {
 
     fireEvent.click(retryButton);
     expect(mockRegenerate).toHaveBeenCalledTimes(1);
+    expect(mockRegenerate).toHaveBeenCalledWith({
+      metadata: {
+        topicId: "topic",
+        assistantId: "assistant",
+        parentId: "m1",
+      },
+    });
   });
 
   it("shows stop button while busy", () => {

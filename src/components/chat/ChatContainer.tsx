@@ -435,6 +435,21 @@ export function ChatContainer({
     [data?.topic, sendMessage],
   );
 
+  const handleRegenerate = useCallback(async () => {
+    if (!data?.topic) {
+      await regenerate();
+      return;
+    }
+
+    await regenerate({
+      metadata: {
+        topicId: data.topic.id,
+        assistantId: data.topic.assistantId,
+        parentId: currentLeafId,
+      } satisfies ChatRequestMetadata,
+    });
+  }, [currentLeafId, data?.topic, regenerate]);
+
   const isBusy = status === "submitted" || status === "streaming";
   const pendingUserMessageId =
     status === "submitted"
@@ -501,7 +516,7 @@ export function ChatContainer({
                   <span>{connectionError ?? chatError?.message}</span>
                   <button
                     type="button"
-                    onClick={() => regenerate()}
+                    onClick={() => void handleRegenerate()}
                     className="touch-manipulation rounded-md px-2 py-1 text-xs font-semibold text-red-700 underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40 dark:text-red-200 dark:focus-visible:ring-red-400/40"
                     tabIndex={0}
                     aria-label="重试生成"
