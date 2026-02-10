@@ -54,3 +54,7 @@ prisma/generated
 .pnpm-store
 
 *.pyc
+
+
+.claude/skills/next-best-practices
+.trae/skills/next-best-practices

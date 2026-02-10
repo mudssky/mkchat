@@ -1,6 +1,7 @@
 [mcp_servers.playwright]
 command = "bunx"
 args = ["@playwright/mcp@latest"]
+enabled = false
 
 [mcp_servers.next-devtools]
 command = "bunx"
