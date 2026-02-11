@@ -16,6 +16,9 @@ export function getLightweightModelId(
       return "gpt-4o-mini";
     case "anthropic":
       return "claude-haiku-4-20250414";
+    case "openai-compatible":
+      // OpenAI 兼容供应商无法预知轻量模型，直接使用 fallback
+      return fallbackModelId;
     default:
       return fallbackModelId;
   }

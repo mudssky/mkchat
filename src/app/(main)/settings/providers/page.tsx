@@ -83,8 +83,13 @@ export default function ProvidersSettingsPage() {
               <div className="flex-1">
                 <div className="flex items-center gap-2">
                   <h3 className="font-medium text-zinc-900 dark:text-zinc-50">
-                    {provider.name}
+                    {provider.displayName || provider.name}
                   </h3>
+                  {provider.type === "openai-compatible" && (
+                    <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                      OpenAI 兼容
+                    </span>
+                  )}
                   {provider.enabled ? (
                     <StatusBadge label="已启用" tone="success" size="xs" />
                   ) : (

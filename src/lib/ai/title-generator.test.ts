@@ -40,6 +40,12 @@ describe("getLightweightModelId", () => {
     );
   });
 
+  it("returns fallback for openai-compatible provider", () => {
+    expect(getLightweightModelId("openai-compatible", "deepseek-chat")).toBe(
+      "deepseek-chat",
+    );
+  });
+
   it("returns fallback for unknown provider", () => {
     expect(getLightweightModelId("deepseek", "deepseek-chat")).toBe(
       "deepseek-chat",

@@ -3,7 +3,10 @@ import { createOpenAI } from "@ai-sdk/openai";
 import type { ProviderConfig } from "@generated/client";
 
 export function getModel(providerConfig: ProviderConfig, modelId: string) {
-  if (providerConfig.type === "openai") {
+  if (
+    providerConfig.type === "openai" ||
+    providerConfig.type === "openai-compatible"
+  ) {
     const openai = createOpenAI({
       apiKey: providerConfig.apiKey,
       baseURL: providerConfig.baseUrl || undefined,

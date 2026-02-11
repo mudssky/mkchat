@@ -132,6 +132,37 @@ describe("getModel", () => {
     });
   });
 
+  describe("OpenAI Compatible Provider", () => {
+    it("应该为 openai-compatible provider 创建模型（复用 OpenAI SDK）", () => {
+      const config: ProviderConfig = {
+        ...mockProviderConfig,
+        type: "openai-compatible",
+        baseUrl: "https://api.deepseek.com/v1",
+      };
+
+      const result = getModel(config, "deepseek-chat");
+
+      expect(result).toEqual({
+        type: "openai",
+        modelId: "deepseek-chat",
+      });
+    });
+
+    it("应该为 openai-compatible provider 传递自定义 baseUrl", () => {
+      const config: ProviderConfig = {
+        ...mockProviderConfig,
+        type: "openai-compatible",
+        baseUrl: "https://api.groq.com/openai/v1",
+        apiKey: "gsk-test-key",
+      };
+
+      const result = getModel(config, "llama-3.1-70b-versatile");
+
+      expect(result).toBeDefined();
+      expect(result.modelId).toBe("llama-3.1-70b-versatile");
+    });
+  });
+
   describe("错误处理", () => {
     it("应该为不支持的 provider 类型抛出错误", () => {
       const config: ProviderConfig = {

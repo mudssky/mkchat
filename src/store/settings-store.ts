@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { SettingsStore } from "@/types/settings";
+import type { ProviderConfig, SettingsStore } from "@/types/settings";
 
 /**
  * 设置状态管理 Store
@@ -77,6 +77,7 @@ export const useSettingsStore = create<SettingsStore>()(
     }),
     {
       name: "mkchat-settings",
+      version: 1,
       // 只持久化需要的字段
       partialize: (state) => ({
         theme: state.theme,
@@ -84,6 +85,33 @@ export const useSettingsStore = create<SettingsStore>()(
         providers: state.providers,
         mcpServers: state.mcpServers,
       }),
+      // 从 v0 迁移：为缺少 type 字段的旧 Provider 推导类型
+      migrate: (persisted, version) => {
+        if (version === 0) {
+          const state = persisted as Record<string, unknown>;
+          const oldProviders = (state.providers ?? {}) as Record<
+            string,
+            ProviderConfig
+          >;
+          const migratedProviders: Record<string, ProviderConfig> = {};
+          for (const [key, provider] of Object.entries(oldProviders)) {
+            if (!provider.type) {
+              const knownTypes: Record<string, ProviderConfig["type"]> = {
+                openai: "openai",
+                anthropic: "anthropic",
+              };
+              migratedProviders[key] = {
+                ...provider,
+                type: knownTypes[provider.name] ?? "openai-compatible",
+              };
+            } else {
+              migratedProviders[key] = provider;
+            }
+          }
+          return { ...state, providers: migratedProviders };
+        }
+        return persisted as SettingsStore;
+      },
     },
   ),
 );

@@ -5,14 +5,19 @@
 // 主题选项
 export type ThemeMode = "light" | "dark" | "system";
 
+// 提供商类型
+export type ProviderType = "openai" | "anthropic" | "openai-compatible";
+
 // 提供商配置
 export interface ProviderConfig {
-  name: string; // openai, anthropic, etc.
+  name: string; // openai, anthropic, 或自定义名称（如 "DeepSeek"）
+  type: ProviderType; // 提供商类型
   apiKey: string;
   apiEndpoint?: string;
   models?: string[]; // 可用的模型列表
   selectedModel?: string; // 当前选中的模型
   enabled: boolean;
+  displayName?: string; // 自定义显示名称（openai-compatible 类型专用）
 }
 
 // MCP 服务器配置
