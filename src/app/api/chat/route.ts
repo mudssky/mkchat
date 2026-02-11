@@ -1,6 +1,7 @@
 import { type ModelMessage, streamText, type ToolSet, tool } from "ai";
 import { z } from "zod";
 import { getModel } from "@/lib/ai/model-factory";
+import { generateTopicTitle } from "@/lib/ai/title-generator";
 import { isValidTopicId } from "@/lib/chat/topic-id";
 import logger from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
@@ -237,6 +238,40 @@ export async function POST(req: Request) {
             topicId,
             parentId: userMsg.id,
           });
+        }
+
+        // Fire-and-forget: 自动生成对话标题（仅首次）
+        if (!isE2eChatMockEnabled() && text) {
+          void (async () => {
+            try {
+              const topic = await prisma.topic.findUnique({
+                where: { id: topicId },
+                select: { title: true },
+              });
+
+              if (topic?.title) return; // 已有标题，跳过
+
+              const snippet = `User: ${extracted.content}\nAssistant: ${text.slice(0, 500)}`;
+              const title = await generateTopicTitle(
+                assistant.providerConfig!,
+                assistant.modelId,
+                snippet,
+              );
+
+              if (title) {
+                await prisma.topic.update({
+                  where: { id: topicId },
+                  data: { title },
+                });
+                logger.info({ topicId, title }, "Auto-generated topic title");
+              }
+            } catch (titleError) {
+              logger.warn(
+                { error: titleError, topicId },
+                "Failed to auto-generate topic title",
+              );
+            }
+          })();
         }
       },
     });
