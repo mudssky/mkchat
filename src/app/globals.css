@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:is([data-theme="dark"] *));
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -31,8 +33,23 @@
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans);
+@layer base {
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+  }
+}
+
+/*
+ * antd/dist/reset.css 将 `input, button, select … { color: inherit }` 置为
+ * unlayered，导致其优先级高于 Tailwind @layer utilities 中的 text-* 类。
+ * 用同等 unlayered 选择器 + revert-layer 恢复，让 Tailwind 层级正确覆盖。
+ */
+input,
+button,
+select,
+optgroup,
+textarea {
+  color: revert-layer;
 }
