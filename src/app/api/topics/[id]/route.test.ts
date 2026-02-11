@@ -1,11 +1,12 @@
 import type { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { GET, PATCH } from "./route";
+import { DELETE, GET, PATCH } from "./route";
 
 const prismaMock = vi.hoisted(() => ({
   topic: {
     findUnique: vi.fn(),
     update: vi.fn(),
+    delete: vi.fn(),
   },
 }));
 
@@ -204,7 +205,7 @@ describe("PATCH /api/topics/[id]", () => {
     expect(body.error).toBe("Validation failed");
   });
 
-  it("returns 400 for missing title field", async () => {
+  it("returns 400 for empty body (no fields)", async () => {
     const request = new Request("http://localhost", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -218,6 +219,109 @@ describe("PATCH /api/topics/[id]", () => {
     expect(response.status).toBe(400);
   });
 
+  it("pins a topic", async () => {
+    prismaMock.topic.findUnique.mockResolvedValue({
+      id: validId,
+      pinned: false,
+    });
+    prismaMock.topic.update.mockResolvedValue({ id: validId, pinned: true });
+
+    const request = new Request("http://localhost", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ pinned: true }),
+    }) as unknown as NextRequest;
+
+    const response = await PATCH(request, {
+      params: Promise.resolve({ id: validId }),
+    });
+
+    expect(response.status).toBe(200);
+    expect(prismaMock.topic.update).toHaveBeenCalledWith({
+      where: { id: validId },
+      data: { pinned: true },
+    });
+  });
+
+  it("unpins a topic", async () => {
+    prismaMock.topic.findUnique.mockResolvedValue({
+      id: validId,
+      pinned: true,
+    });
+    prismaMock.topic.update.mockResolvedValue({ id: validId, pinned: false });
+
+    const request = new Request("http://localhost", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ pinned: false }),
+    }) as unknown as NextRequest;
+
+    const response = await PATCH(request, {
+      params: Promise.resolve({ id: validId }),
+    });
+
+    expect(response.status).toBe(200);
+    expect(prismaMock.topic.update).toHaveBeenCalledWith({
+      where: { id: validId },
+      data: { pinned: false },
+    });
+  });
+
+  it("archives a topic", async () => {
+    const archiveDate = "2026-02-11T00:00:00.000Z";
+    prismaMock.topic.findUnique.mockResolvedValue({
+      id: validId,
+      archivedAt: null,
+    });
+    prismaMock.topic.update.mockResolvedValue({
+      id: validId,
+      archivedAt: archiveDate,
+    });
+
+    const request = new Request("http://localhost", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ archivedAt: archiveDate }),
+    }) as unknown as NextRequest;
+
+    const response = await PATCH(request, {
+      params: Promise.resolve({ id: validId }),
+    });
+
+    expect(response.status).toBe(200);
+    expect(prismaMock.topic.update).toHaveBeenCalledWith({
+      where: { id: validId },
+      data: { archivedAt: new Date(archiveDate) },
+    });
+  });
+
+  it("unarchives a topic by setting archivedAt to null", async () => {
+    prismaMock.topic.findUnique.mockResolvedValue({
+      id: validId,
+      archivedAt: new Date("2026-02-11"),
+    });
+    prismaMock.topic.update.mockResolvedValue({
+      id: validId,
+      archivedAt: null,
+    });
+
+    const request = new Request("http://localhost", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ archivedAt: null }),
+    }) as unknown as NextRequest;
+
+    const response = await PATCH(request, {
+      params: Promise.resolve({ id: validId }),
+    });
+
+    expect(response.status).toBe(200);
+    expect(prismaMock.topic.update).toHaveBeenCalledWith({
+      where: { id: validId },
+      data: { archivedAt: null },
+    });
+  });
+
   it("returns 500 on database errors", async () => {
     prismaMock.topic.findUnique.mockResolvedValue({ id: validId });
     prismaMock.topic.update.mockRejectedValue(new Error("Database error"));
@@ -229,6 +333,83 @@ describe("PATCH /api/topics/[id]", () => {
     }) as unknown as NextRequest;
 
     const response = await PATCH(request, {
+      params: Promise.resolve({ id: validId }),
+    });
+
+    expect(response.status).toBe(500);
+    expect(loggerMock.error).toHaveBeenCalled();
+  });
+});
+
+describe("DELETE /api/topics/[id]", () => {
+  const validId = `c${"a".repeat(24)}`;
+
+  beforeEach(() => {
+    prismaMock.topic.findUnique.mockReset();
+    prismaMock.topic.delete.mockReset();
+    loggerMock.error.mockReset();
+  });
+
+  it("deletes a topic successfully", async () => {
+    prismaMock.topic.findUnique.mockResolvedValue({ id: validId });
+    prismaMock.topic.delete.mockResolvedValue({ id: validId });
+
+    const request = new Request("http://localhost", {
+      method: "DELETE",
+    }) as unknown as NextRequest;
+
+    const response = await DELETE(request, {
+      params: Promise.resolve({ id: validId }),
+    });
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({ success: true });
+    expect(prismaMock.topic.delete).toHaveBeenCalledWith({
+      where: { id: validId },
+    });
+  });
+
+  it("returns 404 when topic does not exist", async () => {
+    prismaMock.topic.findUnique.mockResolvedValue(null);
+
+    const request = new Request("http://localhost", {
+      method: "DELETE",
+    }) as unknown as NextRequest;
+
+    const response = await DELETE(request, {
+      params: Promise.resolve({ id: validId }),
+    });
+
+    expect(response.status).toBe(404);
+    await expect(response.json()).resolves.toEqual({
+      error: "Topic not found",
+    });
+  });
+
+  it("returns 404 for invalid id", async () => {
+    const request = new Request("http://localhost", {
+      method: "DELETE",
+    }) as unknown as NextRequest;
+
+    const response = await DELETE(request, {
+      params: Promise.resolve({ id: "invalid-id" }),
+    });
+
+    expect(response.status).toBe(404);
+    await expect(response.json()).resolves.toEqual({
+      error: "Invalid topic id",
+    });
+  });
+
+  it("returns 500 on database errors", async () => {
+    prismaMock.topic.findUnique.mockResolvedValue({ id: validId });
+    prismaMock.topic.delete.mockRejectedValue(new Error("Database error"));
+
+    const request = new Request("http://localhost", {
+      method: "DELETE",
+    }) as unknown as NextRequest;
+
+    const response = await DELETE(request, {
       params: Promise.resolve({ id: validId }),
     });
 

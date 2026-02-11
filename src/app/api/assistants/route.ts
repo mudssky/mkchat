@@ -25,6 +25,8 @@ export async function GET() {
             title: true,
             createdAt: true,
             updatedAt: true,
+            pinned: true,
+            archivedAt: true,
           },
         },
       },

@@ -30,6 +30,8 @@ export interface AssistantTopicSummary {
   title?: string | null;
   createdAt: string;
   updatedAt: string;
+  pinned: boolean;
+  archivedAt: string | null;
 }
 
 export interface AssistantSummary {
@@ -55,5 +57,7 @@ export interface ChatTopic {
   title?: string | null;
   createdAt: string;
   updatedAt: string;
+  pinned: boolean;
+  archivedAt: string | null;
   messages: ChatMessage[];
 }

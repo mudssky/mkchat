@@ -7,13 +7,15 @@ model Topic {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   title       String? // Auto-generated summary
+  pinned      Boolean   @default(false)
+  archivedAt  DateTime?
 }
 
 // 5. 消息 (The Tree)
 model Message {
   id        String   @id @default(cuid())
   topicId   String
-  topic     Topic    @relation(fields: [topicId], references: [id])
+  topic     Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
   content   String
   role      String // user/assistant/system/tool
   metadata  Json?

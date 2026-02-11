@@ -35,6 +35,8 @@ type TopicDetail = Prisma.TopicGetPayload<{
     title: true;
     createdAt: true;
     updatedAt: true;
+    pinned: true;
+    archivedAt: true;
     assistant: {
       select: { name: true; modelId: true; providerConfigId: true };
     };
@@ -59,6 +61,8 @@ function toChatTopic(topic: TopicDetail): ChatTopic {
     title: topic.title,
     createdAt: topic.createdAt.toISOString(),
     updatedAt: topic.updatedAt.toISOString(),
+    pinned: topic.pinned,
+    archivedAt: topic.archivedAt?.toISOString() ?? null,
     messages: topic.messages.map((message) => ({
       id: message.id,
       topicId: message.topicId,
@@ -90,6 +94,8 @@ export default async function ChatPage({ params }: Props) {
         title: true,
         createdAt: true,
         updatedAt: true,
+        pinned: true,
+        archivedAt: true,
         assistant: {
           select: {
             name: true,

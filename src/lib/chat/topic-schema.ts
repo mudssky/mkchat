@@ -27,6 +27,8 @@ export const chatTopicSchema: z.ZodType<ChatTopic> = z.object({
   title: z.string().nullable().optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
+  pinned: z.boolean(),
+  archivedAt: z.string().nullable(),
   messages: z.array(chatMessageSchema),
 });
 

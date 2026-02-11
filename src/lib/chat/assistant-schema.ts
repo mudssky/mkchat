@@ -10,6 +10,8 @@ export const assistantTopicSchema: z.ZodType<AssistantTopicSummary> = z.object({
   title: z.string().nullable().optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
+  pinned: z.boolean(),
+  archivedAt: z.string().nullable(),
 });
 
 export const assistantSummarySchema: z.ZodType<AssistantSummary> = z.object({
