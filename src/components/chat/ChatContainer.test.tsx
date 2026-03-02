@@ -7,9 +7,20 @@ const mockSetMessages = vi.fn();
 const mockRegenerate = vi.fn();
 const mockStop = vi.fn();
 const useChatMock = vi.fn();
+const mockSendCompare = vi.fn().mockResolvedValue(undefined);
+const mockStopAll = vi.fn();
 
 vi.mock("@ai-sdk/react", () => ({
   useChat: (...args: unknown[]) => useChatMock(...args),
+}));
+
+vi.mock("@/hooks/use-compare-chat", () => ({
+  useCompareChat: () => ({
+    streams: [],
+    isComparing: false,
+    sendCompare: mockSendCompare,
+    stopAll: mockStopAll,
+  }),
 }));
 
 vi.mock("@tanstack/react-query", () => ({
@@ -48,6 +59,9 @@ const chatStoreState = {
   setCurrentBranch: vi.fn(),
   inputDraft: "draft",
   updateDraft: vi.fn(),
+  compareModels: [],
+  setCompareModels: vi.fn(),
+  clearCompareModels: vi.fn(),
 };
 
 vi.mock("@/store/chat-store", () => ({
@@ -67,6 +81,10 @@ vi.mock("./MessageInput", () => ({
   ),
 }));
 
+vi.mock("./CompareView", () => ({
+  CompareView: () => <div data-testid="compare-view">CompareView</div>,
+}));
+
 describe("ChatContainer", () => {
   beforeEach(() => {
     mockSendMessage.mockReset();
@@ -74,6 +92,8 @@ describe("ChatContainer", () => {
     mockRegenerate.mockReset();
     mockStop.mockReset();
     useChatMock.mockReset();
+    mockSendCompare.mockReset().mockResolvedValue(undefined);
+    mockStopAll.mockReset();
   });
 
   it("renders message list and input", () => {
@@ -180,5 +200,36 @@ describe("ChatContainer", () => {
     expect(screen.getByText("性能监控（最近 5 条）")).toBeTruthy();
 
     vi.unstubAllEnvs();
+  });
+
+  it("renders with compare mode integration (smoke test)", () => {
+    useChatMock.mockReturnValue({
+      messages: [
+        {
+          id: "m1",
+          role: "user",
+          parts: [{ type: "text", text: "hi" }],
+          metadata: {
+            topicId: "topic",
+            parentId: null,
+            createdAt: "2024-01-01T00:00:00Z",
+          },
+        },
+      ],
+      sendMessage: mockSendMessage,
+      status: "ready",
+      error: undefined,
+      stop: mockStop,
+      regenerate: mockRegenerate,
+      setMessages: mockSetMessages,
+    });
+
+    render(<ChatContainer topicId="topic" />);
+
+    // Core elements render
+    expect(screen.getByTestId("message-list")).toBeTruthy();
+    expect(screen.getByTestId("message-input")).toBeTruthy();
+    // No compare view when not comparing
+    expect(screen.queryByTestId("compare-view")).toBeNull();
   });
 });

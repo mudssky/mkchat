@@ -242,6 +242,213 @@ describe("POST /api/chat", () => {
     });
   });
 
+  describe("compare mode", () => {
+    it("skips user message creation when compareParentId is provided", async () => {
+      prismaMock.assistant.findUnique.mockResolvedValue(assistantMock);
+      (prismaMock as Record<string, unknown>).message = {
+        findUnique: vi.fn().mockResolvedValue({
+          id: "existing-user-msg",
+          topicId: validTopicId,
+          content: "hi",
+          role: "user",
+          parentId: null,
+        }),
+      };
+      chatServiceMock.getTrace.mockResolvedValue([
+        {
+          id: "existing-user-msg",
+          topicId: validTopicId,
+          content: "hi",
+          role: "user",
+          parentId: null,
+          createdAt: new Date(),
+        },
+      ]);
+      mcpServiceMock.getToolsForAssistant.mockResolvedValue([]);
+      getModelMock.mockReturnValue({});
+
+      const streamResponse = new Response("stream");
+      streamTextMock.mockReturnValue({
+        toUIMessageStreamResponse: vi.fn().mockReturnValue(streamResponse),
+      });
+
+      const request = new Request("http://localhost/api/chat", {
+        method: "POST",
+        body: JSON.stringify({
+          topicId: validTopicId,
+          assistantId: "assistant-1",
+          message: "compare this",
+          compareParentId: "existing-user-msg",
+          compareGroupId: "group-1",
+          compareModelId: "gpt-4o",
+          compareProviderName: "OpenAI",
+        }),
+      });
+
+      const response = await POST(request);
+
+      expect(response).toBe(streamResponse);
+      // Should NOT create a user message
+      expect(chatServiceMock.createMessage).not.toHaveBeenCalled();
+      // Should use compareParentId for trace
+      expect(chatServiceMock.getTrace).toHaveBeenCalledWith(
+        "existing-user-msg",
+      );
+    });
+
+    it("returns 400 when compareParentId points to non-existent message", async () => {
+      (prismaMock as Record<string, unknown>).message = {
+        findUnique: vi.fn().mockResolvedValue(null),
+      };
+
+      const request = new Request("http://localhost/api/chat", {
+        method: "POST",
+        body: JSON.stringify({
+          topicId: validTopicId,
+          assistantId: "assistant-1",
+          message: "compare this",
+          compareParentId: "non-existent-msg",
+        }),
+      });
+
+      const response = await POST(request);
+
+      expect(response.status).toBe(400);
+      await expect(response.json()).resolves.toEqual({
+        error: "Compare parent message not found",
+      });
+    });
+
+    it("writes compare metadata in e2e mock mode", async () => {
+      vi.stubEnv("MKCHAT_E2E_MOCK_CHAT", "1");
+
+      prismaMock.assistant.findUnique.mockResolvedValue(assistantMock);
+      (prismaMock as Record<string, unknown>).message = {
+        findUnique: vi.fn().mockResolvedValue({
+          id: "existing-user-msg",
+          topicId: validTopicId,
+          content: "hi",
+          role: "user",
+          parentId: null,
+        }),
+      };
+      chatServiceMock.createMessage.mockResolvedValue({
+        id: "msg-assistant",
+        topicId: validTopicId,
+        content: "Mocked reply: compare this",
+        role: "assistant",
+        parentId: "existing-user-msg",
+        createdAt: new Date(),
+      });
+
+      const request = new Request("http://localhost/api/chat", {
+        method: "POST",
+        body: JSON.stringify({
+          topicId: validTopicId,
+          assistantId: "assistant-1",
+          message: "compare this",
+          compareParentId: "existing-user-msg",
+          compareGroupId: "group-1",
+          compareModelId: "gpt-4o",
+          compareProviderName: "OpenAI",
+        }),
+      });
+
+      const response = await POST(request);
+
+      expect(response.status).toBe(200);
+      expect(chatServiceMock.createMessage).toHaveBeenCalledWith(
+        expect.objectContaining({
+          role: "assistant",
+          parentId: "existing-user-msg",
+          metadata: {
+            compareGroupId: "group-1",
+            compareModelId: "gpt-4o",
+            compareProviderName: "OpenAI",
+          },
+        }),
+      );
+
+      vi.unstubAllEnvs();
+    });
+
+    it("includes compare metadata in abort handler", async () => {
+      prismaMock.assistant.findUnique.mockResolvedValue(assistantMock);
+      (prismaMock as Record<string, unknown>).message = {
+        findUnique: vi.fn().mockResolvedValue({
+          id: "existing-user-msg",
+          topicId: validTopicId,
+          content: "hi",
+          role: "user",
+          parentId: null,
+        }),
+      };
+      chatServiceMock.createMessage.mockResolvedValue({
+        id: "msg-assistant",
+        topicId: validTopicId,
+        content: "partial",
+        role: "assistant",
+        parentId: "existing-user-msg",
+        createdAt: new Date(),
+      });
+      chatServiceMock.getTrace.mockResolvedValue([
+        {
+          id: "existing-user-msg",
+          topicId: validTopicId,
+          content: "hi",
+          role: "user",
+          parentId: null,
+          createdAt: new Date(),
+        },
+      ]);
+      mcpServiceMock.getToolsForAssistant.mockResolvedValue([]);
+      getModelMock.mockReturnValue({});
+
+      const streamResponse = new Response("stream");
+      streamTextMock.mockImplementation((options: Record<string, unknown>) => {
+        const onChunk = options.onChunk as
+          | ((event: { chunk: { type: string; text: string } }) => void)
+          | undefined;
+        const onAbort = options.onAbort as (() => Promise<void>) | undefined;
+
+        onChunk?.({ chunk: { type: "text-delta", text: "partial" } });
+        void onAbort?.();
+
+        return {
+          toUIMessageStreamResponse: vi.fn().mockReturnValue(streamResponse),
+        };
+      });
+
+      const request = new Request("http://localhost/api/chat", {
+        method: "POST",
+        body: JSON.stringify({
+          topicId: validTopicId,
+          assistantId: "assistant-1",
+          message: "compare this",
+          compareParentId: "existing-user-msg",
+          compareGroupId: "group-1",
+          compareModelId: "gpt-4o",
+          compareProviderName: "OpenAI",
+        }),
+      });
+
+      await POST(request);
+
+      expect(chatServiceMock.createMessage).toHaveBeenCalledWith(
+        expect.objectContaining({
+          role: "assistant",
+          metadata: expect.objectContaining({
+            incomplete: true,
+            stopped: true,
+            compareGroupId: "group-1",
+            compareModelId: "gpt-4o",
+            compareProviderName: "OpenAI",
+          }),
+        }),
+      );
+    });
+  });
+
   it("returns mocked stream in e2e mock mode", async () => {
     vi.stubEnv("MKCHAT_E2E_MOCK_CHAT", "1");
 

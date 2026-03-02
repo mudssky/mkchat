@@ -2,6 +2,7 @@ interface MessageNode {
   id: string;
   parentId: string | null;
   createdAt?: Date | string | null;
+  metadata?: { compareGroupId?: string } | null;
 }
 
 function toTimestamp(value?: Date | string | null): number {
@@ -107,4 +108,53 @@ export function getDefaultLeafFrom<T extends MessageNode>(
   }
 
   return null;
+}
+
+/**
+ * Returns all messages that share the same compareGroupId.
+ */
+export function findCompareGroup<T extends MessageNode>(
+  messages: T[],
+  compareGroupId: string,
+): T[] {
+  if (!compareGroupId || messages.length === 0) return [];
+
+  const group = messages.filter(
+    (m) =>
+      m.metadata &&
+      typeof m.metadata === "object" &&
+      "compareGroupId" in m.metadata &&
+      m.metadata.compareGroupId === compareGroupId,
+  );
+
+  return sortByCreatedAt(group);
+}
+
+/**
+ * Checks if the children of a given parentId form a compare group
+ * (i.e., they all share the same non-empty compareGroupId).
+ */
+export function isCompareGroup<T extends MessageNode>(
+  messages: T[],
+  parentId: string,
+): boolean {
+  if (!parentId || messages.length === 0) return false;
+
+  const children = messages.filter((m) => m.parentId === parentId);
+  if (children.length < 2) return false;
+
+  const groupIds = children
+    .map((m) =>
+      m.metadata &&
+      typeof m.metadata === "object" &&
+      "compareGroupId" in m.metadata
+        ? m.metadata.compareGroupId
+        : undefined,
+    )
+    .filter(Boolean);
+
+  if (groupIds.length < 2) return false;
+
+  const firstGroupId = groupIds[0];
+  return groupIds.every((gid) => gid === firstGroupId);
 }

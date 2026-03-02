@@ -18,6 +18,9 @@ export async function GET() {
         systemPrompt: true,
         modelId: true,
         providerConfigId: true,
+        providerConfig: {
+          select: { name: true },
+        },
         topics: {
           orderBy: { updatedAt: "desc" },
           select: {
@@ -32,10 +35,13 @@ export async function GET() {
       },
     });
 
-    const summary = assistants.map(({ systemPrompt, ...assistant }) => ({
-      ...assistant,
-      description: buildAssistantDescription(systemPrompt),
-    }));
+    const summary = assistants.map(
+      ({ systemPrompt, providerConfig, ...assistant }) => ({
+        ...assistant,
+        description: buildAssistantDescription(systemPrompt),
+        providerName: providerConfig?.name ?? null,
+      }),
+    );
 
     return Response.json({ assistants: summary });
   } catch (error) {

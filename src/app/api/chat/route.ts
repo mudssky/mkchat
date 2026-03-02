@@ -7,7 +7,10 @@ import logger from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
 import { chatService } from "@/services/chat-service";
 import { mcpService } from "@/services/mcp-service";
-import type { ChatMessageMetadata } from "@/types/chat";
+import type {
+  ChatMessageMetadata,
+  ChatMessageRecordMetadata,
+} from "@/types/chat";
 
 export const maxDuration = 60;
 
@@ -32,6 +35,10 @@ const requestSchema = z.object({
   parentId: z.string().nullable().optional(),
   message: z.string().optional(),
   messages: z.array(uiMessageSchema).optional(),
+  compareParentId: z.string().optional(),
+  compareGroupId: z.string().optional(),
+  compareModelId: z.string().optional(),
+  compareProviderName: z.string().optional(),
 });
 
 type UiMessagePayload = z.infer<typeof uiMessageSchema>;
@@ -128,10 +135,35 @@ export async function POST(req: Request) {
       return Response.json({ error: "Invalid request" }, { status: 400 });
     }
 
-    const { topicId, assistantId, parentId, message, messages } = parsed.data;
+    const {
+      topicId,
+      assistantId,
+      parentId,
+      message,
+      messages,
+      compareParentId,
+      compareGroupId,
+      compareModelId,
+      compareProviderName,
+    } = parsed.data;
+
+    const isCompareMode = !!compareParentId;
 
     if (!isValidTopicId(topicId)) {
       return Response.json({ error: "Invalid topic id" }, { status: 404 });
+    }
+
+    // In compare mode with compareParentId, validate that the parent message exists
+    if (isCompareMode) {
+      const parentMsg = await prisma.message.findUnique({
+        where: { id: compareParentId },
+      });
+      if (!parentMsg) {
+        return Response.json(
+          { error: "Compare parent message not found" },
+          { status: 400 },
+        );
+      }
     }
 
     const extracted = message
@@ -153,26 +185,47 @@ export async function POST(req: Request) {
       return new Response("Assistant or Provider not found", { status: 404 });
     }
 
-    const userMsg = await chatService.createMessage({
-      content: extracted.content,
-      role: "user",
-      topicId,
-      parentId,
-    });
+    // In compare mode: skip user message creation, use compareParentId as parent
+    // In normal mode: create user message as usual
+    let userMsgId: string;
+    if (isCompareMode) {
+      userMsgId = compareParentId;
+    } else {
+      const userMsg = await chatService.createMessage({
+        content: extracted.content,
+        role: "user",
+        topicId,
+        parentId,
+      });
+      userMsgId = userMsg.id;
+    }
 
     if (isE2eChatMockEnabled()) {
       const mockText = `Mocked reply: ${extracted.content}`;
+      const compareMetadata: ChatMessageRecordMetadata = {};
+      if (isCompareMode) {
+        if (compareGroupId) compareMetadata.compareGroupId = compareGroupId;
+        if (compareModelId) compareMetadata.compareModelId = compareModelId;
+        if (compareProviderName)
+          compareMetadata.compareProviderName = compareProviderName;
+      }
+
       const assistantMsg = await chatService.createMessage({
         content: mockText,
         role: "assistant",
         topicId,
-        parentId: userMsg.id,
+        parentId: userMsgId,
+        metadata:
+          Object.keys(compareMetadata).length > 0 ? compareMetadata : undefined,
       });
 
       const metadata: ChatMessageMetadata = {
         topicId,
-        parentId: extracted.uiMessageId || userMsg.id,
+        parentId: extracted.uiMessageId || userMsgId,
         createdAt: new Date().toISOString(),
+        ...(compareGroupId && { compareGroupId }),
+        ...(compareModelId && { compareModelId }),
+        ...(compareProviderName && { compareProviderName }),
       };
 
       return createMockUIMessageStreamResponse(
@@ -182,7 +235,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const dbMessages = await chatService.getTrace(userMsg.id);
+    const dbMessages = await chatService.getTrace(userMsgId);
     const model = getModel(assistant.providerConfig, assistant.modelId);
 
     const enrichedTools = await mcpService.getToolsForAssistant(assistantId);
@@ -201,6 +254,14 @@ export async function POST(req: Request) {
           );
         },
       });
+    }
+
+    const compareRecordMetadata: ChatMessageRecordMetadata = {};
+    if (isCompareMode) {
+      if (compareGroupId) compareRecordMetadata.compareGroupId = compareGroupId;
+      if (compareModelId) compareRecordMetadata.compareModelId = compareModelId;
+      if (compareProviderName)
+        compareRecordMetadata.compareProviderName = compareProviderName;
     }
 
     let partialText = "";
@@ -225,8 +286,12 @@ export async function POST(req: Request) {
           content,
           role: "assistant",
           topicId,
-          parentId: userMsg.id,
-          metadata: { incomplete: true, stopped: true },
+          parentId: userMsgId,
+          metadata: {
+            incomplete: true,
+            stopped: true,
+            ...compareRecordMetadata,
+          },
         });
       },
       onFinish: async ({ text }) => {
@@ -236,12 +301,16 @@ export async function POST(req: Request) {
             content: text,
             role: "assistant",
             topicId,
-            parentId: userMsg.id,
+            parentId: userMsgId,
+            metadata:
+              Object.keys(compareRecordMetadata).length > 0
+                ? compareRecordMetadata
+                : undefined,
           });
         }
 
-        // Fire-and-forget: 自动生成对话标题（仅首次）
-        if (!isE2eChatMockEnabled() && text) {
+        // Fire-and-forget: 自动生成对话标题（仅首次，非对比模式）
+        if (!isE2eChatMockEnabled() && text && !isCompareMode) {
           void (async () => {
             try {
               const topic = await prisma.topic.findUnique({
@@ -278,8 +347,11 @@ export async function POST(req: Request) {
 
     const assistantMetadata: ChatMessageMetadata = {
       topicId,
-      parentId: extracted.uiMessageId || userMsg.id,
+      parentId: extracted.uiMessageId || userMsgId,
       createdAt: new Date().toISOString(),
+      ...(compareGroupId && { compareGroupId }),
+      ...(compareModelId && { compareModelId }),
+      ...(compareProviderName && { compareProviderName }),
     };
 
     return stream.toUIMessageStreamResponse({

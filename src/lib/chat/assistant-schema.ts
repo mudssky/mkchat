@@ -20,6 +20,7 @@ export const assistantSummarySchema: z.ZodType<AssistantSummary> = z.object({
   description: z.string().nullable().optional(),
   modelId: z.string(),
   providerConfigId: z.string().nullable(),
+  providerName: z.string().nullable().optional(),
   topics: z.array(assistantTopicSchema),
 });
 

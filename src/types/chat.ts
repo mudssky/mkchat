@@ -5,6 +5,10 @@ export type ChatRole = "user" | "assistant" | "system" | "tool";
 export type ChatMessageRecordMetadata = Prisma.JsonObject & {
   incomplete?: boolean;
   stopped?: boolean;
+  compareGroupId?: string;
+  compareModelId?: string;
+  compareProviderName?: string;
+  vote?: "up" | "down" | null;
 };
 
 export interface ChatMessage {
@@ -23,6 +27,9 @@ export interface ChatMessageMetadata {
   createdAt: string;
   incomplete?: boolean;
   stopped?: boolean;
+  compareGroupId?: string;
+  compareModelId?: string;
+  compareProviderName?: string;
 }
 
 export interface AssistantTopicSummary {
@@ -40,6 +47,7 @@ export interface AssistantSummary {
   description?: string | null;
   modelId: string;
   providerConfigId: string | null;
+  providerName?: string | null;
   topics: AssistantTopicSummary[];
 }
 

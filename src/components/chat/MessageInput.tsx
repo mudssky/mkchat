@@ -3,6 +3,8 @@
 import { Sender } from "@ant-design/x";
 import { Input } from "antd";
 import { type ComponentProps, useCallback, useMemo, useState } from "react";
+import type { CompareModelSelection } from "@/store/chat-store";
+import { ModelPicker } from "./ModelPicker";
 
 const SenderInput = (props: ComponentProps<typeof Input.TextArea>) => (
   <Input.TextArea {...props} aria-label="聊天输入" />
@@ -13,6 +15,9 @@ interface MessageInputProps {
   onChange: (value: string) => void;
   onSend: (content: string) => Promise<void>;
   disabled?: boolean;
+  compareModels?: CompareModelSelection[];
+  onCompareModelsChange?: (models: CompareModelSelection[]) => void;
+  onCompareSend?: (content: string) => Promise<void>;
 }
 
 export function MessageInput({
@@ -20,11 +25,15 @@ export function MessageInput({
   onChange,
   onSend,
   disabled = false,
+  compareModels = [],
+  onCompareModelsChange,
+  onCompareSend,
 }: MessageInputProps) {
   const [isSending, setIsSending] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const isEmpty = useMemo(() => value.trim().length === 0, [value]);
+  const isCompareMode = compareModels.length >= 2;
 
   const handleSend = useCallback(
     async (content: string) => {
@@ -37,13 +46,17 @@ export function MessageInput({
       setIsSending(true);
       setErrorMessage(null);
       try {
-        await onSend(trimmed);
+        if (isCompareMode && onCompareSend) {
+          await onCompareSend(trimmed);
+        } else {
+          await onSend(trimmed);
+        }
         onChange("");
       } finally {
         setIsSending(false);
       }
     },
-    [disabled, isSending, onSend, onChange],
+    [disabled, isCompareMode, isSending, onCompareSend, onSend, onChange],
   );
 
   return (
@@ -79,13 +92,26 @@ export function MessageInput({
         input: "text-sm leading-6",
       }}
       footer={
-        errorMessage ? (
-          <span className="text-xs text-red-500" role="alert">
-            {errorMessage}
-          </span>
-        ) : isEmpty ? (
-          <span className="text-xs text-zinc-400">请输入内容后发送</span>
-        ) : null
+        <div className="flex flex-col gap-1">
+          {onCompareModelsChange && (
+            <ModelPicker
+              selected={compareModels}
+              onChange={onCompareModelsChange}
+              disabled={disabled || isSending}
+            />
+          )}
+          {errorMessage ? (
+            <span className="text-xs text-red-500" role="alert">
+              {errorMessage}
+            </span>
+          ) : isEmpty ? (
+            <span className="text-xs text-zinc-400">
+              {isCompareMode
+                ? "对比模式：发送后将同时向多个模型请求"
+                : "请输入内容后发送"}
+            </span>
+          ) : null}
+        </div>
       }
     />
   );

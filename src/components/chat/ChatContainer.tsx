@@ -5,16 +5,23 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { DefaultChatTransport, type UIMessage } from "ai";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
+import { useCompareChat } from "@/hooks/use-compare-chat";
 import {
   CHAT_PERFORMANCE_EVENT,
   type ChatPerformanceMetric,
   measureChatPerformance,
 } from "@/lib/chat/chat-performance";
-import { buildMessageChain, getDefaultLeaf } from "@/lib/chat/message-tree";
+import {
+  buildMessageChain,
+  findCompareGroup,
+  getDefaultLeaf,
+  isCompareGroup,
+} from "@/lib/chat/message-tree";
 import type { TopicResponse } from "@/lib/chat/topic-schema";
 import { topicResponseSchema } from "@/lib/chat/topic-schema";
 import { useChatStore } from "@/store/chat-store";
 import type { ChatMessage, ChatMessageMetadata } from "@/types/chat";
+import { CompareView } from "./CompareView";
 import { MessageInput } from "./MessageInput";
 import { MessageList } from "./MessageList";
 
@@ -201,6 +208,21 @@ export function ChatContainer({
   const setCurrentBranch = useChatStore((state) => state.setCurrentBranch);
   const inputDraft = useChatStore((state) => state.inputDraft);
   const updateDraft = useChatStore((state) => state.updateDraft);
+  const compareModels = useChatStore((state) => state.compareModels);
+  const setCompareModels = useChatStore((state) => state.setCompareModels);
+  const clearCompareModels = useChatStore((state) => state.clearCompareModels);
+
+  const {
+    streams: compareStreams,
+    isComparing,
+    sendCompare,
+    stopAll: stopCompare,
+  } = useCompareChat({
+    topicId,
+    onAllComplete: () => {
+      clearCompareModels();
+    },
+  });
 
   const baseMessages = useMemo(() => {
     const topicMessages = data?.topic.messages ?? [];
@@ -450,7 +472,58 @@ export function ChatContainer({
     });
   }, [currentLeafId, data?.topic, regenerate]);
 
-  const isBusy = status === "submitted" || status === "streaming";
+  const handleCompareSend = useCallback(
+    async (content: string) => {
+      if (!data?.topic || compareModels.length < 2) return;
+      lastSentContentRef.current = content;
+      setConnectionError(null);
+      setTimeoutError(null);
+      await sendCompare(content, compareModels, currentLeafId);
+    },
+    [compareModels, currentLeafId, data?.topic, sendCompare],
+  );
+
+  const handleVote = useCallback(
+    async (messageId: string, vote: "up" | "down" | null) => {
+      try {
+        await fetch(`/api/messages/${messageId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            metadata: { vote: vote ?? null },
+          }),
+        });
+      } catch {
+        // silently fail vote
+      }
+    },
+    [],
+  );
+
+  const handleContinueFromCompare = useCallback(
+    (messageId: string) => {
+      const chain = buildMessageChain(displayMessages, messageId).map(
+        (m) => m.id,
+      );
+      setCurrentBranch(chain);
+    },
+    [displayMessages, setCurrentBranch],
+  );
+
+  // Detect compare group at the current leaf
+  const compareGroupMessages = useMemo(() => {
+    if (!currentLeafId || displayMessages.length === 0) return null;
+    const currentMsg = displayMessages.find((m) => m.id === currentLeafId);
+    if (!currentMsg?.parentId) return null;
+    if (!isCompareGroup(displayMessages, currentMsg.parentId)) return null;
+    return findCompareGroup(
+      displayMessages,
+      currentMsg.metadata?.compareGroupId ?? "",
+    );
+  }, [currentLeafId, displayMessages]);
+
+  const isBusy =
+    status === "submitted" || status === "streaming" || isComparing;
   const pendingUserMessageId =
     status === "submitted"
       ? ([...displayMessages].reverse().find((msg) => msg.role === "user")
@@ -500,13 +573,32 @@ export function ChatContainer({
               onSelectLeaf={handleSelectLeaf}
               onEditMessage={handleEdit}
             />
+
+            {/* Compare view: show during streaming or when viewing persisted compare group */}
+            {isComparing && compareStreams.length > 0 ? (
+              <CompareView
+                streamStates={compareStreams}
+                onVote={handleVote}
+                onContinue={handleContinueFromCompare}
+              />
+            ) : compareGroupMessages && compareGroupMessages.length > 1 ? (
+              <CompareView
+                messages={compareGroupMessages}
+                onVote={handleVote}
+                onContinue={handleContinueFromCompare}
+              />
+            ) : null}
           </div>
 
           <div className="sticky bottom-0 border-t border-zinc-200 bg-white/95 px-3 py-3 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/90 sm:px-4">
             <div className="flex w-full flex-col gap-3">
               <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-zinc-400">
                 <span>
-                  {isBusy ? "模型正在生成，请稍候…" : "已就绪，可继续提问"}
+                  {isComparing
+                    ? "对比模式 · 多模型并行生成中…"
+                    : isBusy
+                      ? "模型正在生成，请稍候…"
+                      : "已就绪，可继续提问"}
                 </span>
                 <span>Ctrl / Cmd + Enter 发送</span>
               </div>
@@ -537,18 +629,27 @@ export function ChatContainer({
                 onChange={updateDraft}
                 onSend={handleSend}
                 disabled={isBusy}
+                compareModels={compareModels}
+                onCompareModelsChange={setCompareModels}
+                onCompareSend={handleCompareSend}
               />
 
               <div className="flex min-h-5 items-center gap-3">
                 {isBusy ? (
                   <button
                     type="button"
-                    onClick={() => handleStop()}
+                    onClick={() => {
+                      if (isComparing) {
+                        stopCompare();
+                      } else {
+                        handleStop();
+                      }
+                    }}
                     className="touch-manipulation rounded-md px-2 py-1 text-xs font-semibold text-zinc-500 hover:text-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 dark:text-zinc-400 dark:hover:text-zinc-100 dark:focus-visible:ring-blue-400/40"
                     tabIndex={0}
-                    aria-label="停止生成"
+                    aria-label={isComparing ? "停止全部" : "停止生成"}
                   >
-                    停止生成
+                    {isComparing ? "停止全部" : "停止生成"}
                   </button>
                 ) : null}
                 {isBusy ? (
